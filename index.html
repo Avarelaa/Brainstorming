@@ -1,0 +1,2092 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Universo de Ideas — De 254 posibilidades a 1 propuesta</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- D3.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
+    * {
+      font-family: 'Space Grotesk', sans-serif !important;
+    }
+
+    :root {
+      --bg: #030712;
+      --accent: #3b82f6;
+      --accent-glow: rgba(59, 130, 246, 0.35);
+    }
+
+    body {
+      background-color: var(--bg);
+      overflow: hidden;
+    }
+
+    /* Glassmorphic panels */
+    .glass-panel {
+      background: rgba(17, 24, 39, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+    }
+
+    .glass-panel-heavy {
+      background: rgba(10, 15, 30, 0.9);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.7);
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(17, 24, 39, 0.5);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(59, 130, 246, 0.3);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(59, 130, 246, 0.5);
+    }
+
+    /* Cosmic Glow Effects */
+    .glow-blue { filter: drop-shadow(0 0 12px rgba(59, 130, 246, 0.6)); }
+    .glow-amber { filter: drop-shadow(0 0 12px rgba(245, 158, 11, 0.6)); }
+    .glow-rose { filter: drop-shadow(0 0 12px rgba(244, 63, 94, 0.6)); }
+    .glow-emerald { filter: drop-shadow(0 0 12px rgba(16, 185, 129, 0.6)); }
+
+    /* Animated paths in view 5 */
+    .flow-line {
+      fill: none;
+      stroke-dasharray: 8 4;
+      animation: dash 30s linear infinite;
+    }
+
+    @keyframes dash {
+      to {
+        stroke-dashoffset: -1000;
+      }
+    }
+
+    /* Sparkle / twinkle star animations */
+    @keyframes pulse-slow {
+      0%, 100% { opacity: 0.2; transform: scale(1); }
+      50% { opacity: 0.8; transform: scale(1.1); }
+    }
+    .pulse-glow {
+      animation: pulse-slow 3s ease-in-out infinite;
+    }
+  </style>
+</head>
+<body class="text-slate-100 h-screen w-screen flex flex-col relative select-none">
+
+  <!-- Background Space Canvas -->
+  <canvas id="stars-canvas" class="absolute inset-0 pointer-events-none z-0"></canvas>
+  <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-slate-950/50 pointer-events-none z-0"></div>
+
+  <!-- Mobile Warning Overlay -->
+  <div id="mobile-warning-overlay" class="absolute inset-0 bg-slate-950/95 backdrop-blur-xl z-50 flex flex-col items-center justify-center p-6 text-center md:hidden transition-all duration-500">
+    <div class="w-16 h-16 rounded-full bg-blue-500/10 border border-blue-500/30 flex items-center justify-center mb-6 text-blue-400">
+      <i data-lucide="monitor" class="w-8 h-8 animate-bounce"></i>
+    </div>
+    <h2 class="text-xl font-bold text-white mb-2">Pantalla Recomendada</h2>
+    <p class="text-xs text-slate-400 max-w-sm mb-6 leading-relaxed">
+      ✨ Para disfrutar de esta experiencia interactiva en todo su esplendor (físicas D3 de 254 ideas, flujos de convergencia y mapas cualitativos), te recomendamos abrir este enlace desde un computador de escritorio o laptop.
+    </p>
+    <button onclick="document.getElementById('mobile-warning-overlay').classList.add('hidden')" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 rounded-xl text-xs font-bold text-white tracking-wider uppercase transition-all shadow-lg shadow-blue-500/20">
+      Explorar de todos modos
+    </button>
+  </div>
+
+  <!-- Header -->
+  <header class="relative z-10 w-full px-6 py-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-white/5 bg-slate-950/80 backdrop-blur-md">
+    <div class="flex items-center gap-3">
+      <div class="p-2.5 bg-blue-500/10 rounded-xl border border-blue-500/30 text-blue-400">
+        <i data-lucide="orbit" class="w-6 h-6 animate-spin" style="animation-duration: 20s;"></i>
+      </div>
+      <div>
+        <h1 class="font-black text-xl md:text-2xl tracking-tight text-white flex items-center gap-2">
+          Universo de Ideas <span class="text-xs font-semibold bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded-full border border-blue-500/30">Mapeo Estratégico</span>
+        </h1>
+        <p class="text-xs text-slate-400 tracking-wider uppercase">De 254 posibilidades de diseño a 1 propuesta de alto impacto</p>
+      </div>
+    </div>
+    
+    <!-- Counters & Statistics -->
+    <div class="flex flex-wrap items-center gap-3">
+      <div class="glass-panel px-3 py-1.5 rounded-lg flex items-center gap-2 border-white/10 text-xs">
+        <span class="w-2 h-2 rounded-full bg-slate-400"></span>
+        <span class="text-slate-400">Total Ideas:</span>
+        <span id="cnt-total" class="font-bold text-white text-sm">254</span>
+      </div>
+      <div class="glass-panel px-3 py-1.5 rounded-lg flex items-center gap-2 border-emerald-500/20 text-xs">
+        <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+        <span class="text-slate-400">Mitigan Culpa:</span>
+        <span class="font-bold text-emerald-400 text-sm">84</span>
+      </div>
+      <div class="glass-panel px-3 py-1.5 rounded-lg flex items-center gap-2 border-blue-500/20 text-xs">
+        <span class="w-2 h-2 rounded-full bg-blue-400"></span>
+        <span class="text-slate-400">En Fila:</span>
+        <span id="cnt-visible" class="font-bold text-blue-400 text-sm">254</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- View Switcher Navigation -->
+  <nav class="relative z-10 w-full px-6 py-2.5 bg-slate-900/50 border-b border-white/5 flex gap-2 overflow-x-auto scrollbar-thin items-center">
+    <button class="nav-btn active px-3.5 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all duration-300 flex items-center gap-2 whitespace-nowrap bg-blue-600 text-white shadow-lg shadow-blue-500/20" data-view="1">
+      <i data-lucide="layers" class="w-4 h-4"></i> ① Universo Completo
+    </button>
+    <button class="nav-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all duration-300 flex items-center gap-2 whitespace-nowrap text-slate-400 hover:text-white hover:bg-white/5" data-view="2">
+      <i data-lucide="heart-handshake" class="w-4 h-4"></i> ② Mitigación de Culpa
+    </button>
+    <button class="nav-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all duration-300 flex items-center gap-2 whitespace-nowrap text-slate-400 hover:text-white hover:bg-white/5" data-view="3">
+      <i data-lucide="sparkles" class="w-4 h-4"></i> ③ Ideas Semilla
+    </button>
+    <button class="nav-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all duration-300 flex items-center gap-2 whitespace-nowrap text-slate-400 hover:text-white hover:bg-white/5" data-view="4">
+      <i data-lucide="flame" class="w-4 h-4"></i> ④ Ideas Frontera
+    </button>
+    <button class="nav-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all duration-300 flex items-center gap-2 whitespace-nowrap text-slate-400 hover:text-white hover:bg-white/5" data-view="5">
+      <i data-lucide="git-merge" class="w-4 h-4"></i> ⑤ Convergencia
+    </button>
+    <button class="nav-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all duration-300 flex items-center gap-2 whitespace-nowrap text-slate-400 hover:text-white hover:bg-white/5" data-view="6">
+      <i data-lucide="trophy" class="w-4 h-4"></i> ⑥ Propuesta de Diseño
+    </button>
+    <div class="h-6 w-px bg-white/10 self-center mx-2"></div>
+    <button class="px-3.5 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all duration-300 flex items-center gap-2 whitespace-nowrap text-rose-400 border border-rose-500/20 hover:bg-rose-500/10 mr-2" id="reset-sim-btn">
+      <i data-lucide="refresh-cw" class="w-4 h-4"></i> Reiniciar
+    </button>
+    <button class="px-3.5 py-1.5 rounded-lg text-xs font-bold tracking-wider uppercase transition-all duration-300 flex items-center gap-2 whitespace-nowrap bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-lg shadow-indigo-500/20 border border-indigo-400/30" id="start-tour-btn">
+      <i data-lucide="play" class="w-4 h-4 animate-pulse"></i> Iniciar Tour Guiado
+    </button>
+  </nav>
+
+  <!-- Tour Controller Floating HUD (NOW FULLY DRAGGABLE) -->
+  <div id="tour-controller" class="hidden absolute top-28 md:right-[400px] md:left-auto left-4 right-4 z-30 glass-panel-heavy p-4 rounded-2xl border-blue-500/30 w-[420px] max-w-[90vw] flex flex-col gap-3 shadow-2xl shadow-blue-500/10 transition-all duration-300 ease-out cursor-default">
+    
+    <!-- Draggable Drag-Handle Header -->
+    <div id="tour-controller-header" class="flex items-center justify-between border-b border-white/5 pb-2 select-none cursor-move group">
+      <span class="text-[9px] font-black uppercase tracking-widest text-blue-400 flex items-center gap-1.5">
+        <span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-ping"></span>
+        Tour Metodológico Activo
+      </span>
+      <div class="flex items-center gap-2">
+        <span id="tour-step-indicator" class="text-[10px] font-bold text-slate-400">Paso 1 / 6</span>
+        <i data-lucide="grip-horizontal" class="w-3.5 h-3.5 text-slate-500 group-hover:text-blue-400 transition-colors"></i>
+      </div>
+    </div>
+    
+    <h3 id="tour-step-title" class="text-sm font-bold text-white">Fase de divergencia</h3>
+    <p id="tour-step-desc" class="text-[11px] text-slate-300 leading-relaxed">Breve resumen narrativo explicativo.</p>
+    
+    <!-- HUD Timeline Progress Bar -->
+    <div class="w-full bg-slate-800 rounded-full h-1 overflow-hidden relative">
+      <div id="tour-step-progress" class="bg-blue-500 h-full w-0 transition-all duration-100 ease-linear"></div>
+    </div>
+
+    <!-- HUD Action buttons -->
+    <div class="flex items-center justify-between mt-1">
+      <button id="tour-btn-exit" class="text-[10px] text-rose-400 hover:underline font-bold uppercase tracking-wider flex items-center gap-1">
+        <i data-lucide="x" class="w-3.5 h-3.5"></i> Salir
+      </button>
+      <div class="flex items-center gap-2">
+        <button id="tour-btn-prev" class="p-1.5 rounded-lg bg-slate-800 border border-white/5 text-slate-300 hover:text-white"><i data-lucide="arrow-left" class="w-4 h-4"></i></button>
+        <button id="tour-btn-play" class="p-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-500"><i data-lucide="pause" class="w-4 h-4" id="tour-play-icon"></i></button>
+        <button id="tour-btn-next" class="p-1.5 rounded-lg bg-slate-800 border border-white/5 text-slate-300 hover:text-white"><i data-lucide="arrow-right" class="w-4 h-4"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <main class="flex-1 w-full flex overflow-hidden relative z-10">
+    
+    <!-- LEFT PANEL -->
+    <section class="w-80 border-r border-white/5 flex flex-col overflow-hidden bg-slate-950/40 backdrop-blur-sm shrink-0">
+      
+      <!-- Narrative / Dynamic Info Card -->
+      <div id="narrative-box" class="p-4 border-b border-white/5 bg-slate-900/40">
+        <h2 id="narrative-title" class="font-bold text-sm text-blue-400 mb-1 flex items-center gap-2">
+          <i data-lucide="compass" class="w-4 h-4 text-blue-400"></i> El Universo Completo
+        </h2>
+        <p id="narrative-desc" class="text-xs text-slate-300 leading-relaxed">
+          Explora la distribución de 254 ideas recolectadas. Organizadas en 10 territorios temáticos según el foco de su impacto y solución.
+        </p>
+      </div>
+
+      <!-- Territory Filters Section & Infographics -->
+      <div class="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
+        
+        <!-- Standard Territory List (Visible on View 1, 2, 6) -->
+        <div id="filter-section-container">
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="text-[10px] font-bold tracking-wider text-slate-400 uppercase flex items-center gap-1">
+              <i data-lucide="filter" class="w-3 h-3"></i> Territorios de Exploración
+            </h3>
+            <button id="clear-filters-btn" class="text-[10px] text-blue-400 hover:underline hidden">Limpiar</button>
+          </div>
+          
+          <div id="territory-list" class="flex flex-col gap-1.5">
+            <!-- Programmatically built -->
+          </div>
+        </div>
+
+        <!-- View 3 Pedagogical Seeds Container -->
+        <div id="methodology-seeds-container" class="hidden flex flex-col gap-4 animate-fade-in">
+          <div class="border-b border-white/5 pb-2">
+            <h3 class="text-[10px] font-bold tracking-wider text-amber-400 uppercase flex items-center gap-1.5">
+              <i data-lucide="sparkles" class="text-amber-400"></i> El Anclaje de lo Real
+            </h3>
+            <p class="text-[10px] text-slate-400 mt-1 leading-relaxed">Las 17 ideas semilla actúan como nodos de alta viabilidad y recurrencia técnica.</p>
+          </div>
+
+          <div class="flex flex-col gap-2 text-xs">
+            <p class="text-slate-300 leading-relaxed mb-1">Cuentan con gran peso en el brainstorming original. Selecciona una semilla destacada para enfocarla en el cosmos:</p>
+            
+            <button class="seed-focus-trigger text-left p-2.5 rounded-xl border border-amber-500/10 hover:border-amber-500/30 bg-amber-500/5 hover:bg-amber-500/10 transition-all flex flex-col gap-1" data-node-id="ID9">
+              <span class="font-bold text-amber-300">💡 ID9 - Traspaso de Guardia</span>
+              <span class="text-[10px] text-slate-400 line-clamp-1">Traspaso formal de la guardia con protocolo de seguridad.</span>
+            </button>
+
+            <button class="seed-focus-trigger text-left p-2.5 rounded-xl border border-amber-500/10 hover:border-amber-500/30 bg-amber-500/5 hover:bg-amber-500/10 transition-all flex flex-col gap-1" data-node-id="ID62">
+              <span class="font-bold text-amber-300">💡 ID62 - Validación del hacer</span>
+              <span class="text-[10px] text-slate-400 line-clamp-1">Que el sistema te diga que lo estás haciendo bien.</span>
+            </button>
+
+            <button class="seed-focus-trigger text-left p-2.5 rounded-xl border border-amber-500/10 hover:border-amber-500/30 bg-amber-500/5 hover:bg-amber-500/10 transition-all flex flex-col gap-1" data-node-id="ID66">
+              <span class="font-bold text-amber-300">💡 ID66 - Uber de Cuidadores</span>
+              <span class="text-[10px] text-slate-400 line-clamp-1">Asigna ayuda para urgencias o salvar descoordinaciones.</span>
+            </button>
+
+            <button class="seed-focus-trigger text-left p-2.5 rounded-xl border border-amber-500/10 hover:border-amber-500/30 bg-amber-500/5 hover:bg-amber-500/10 transition-all flex flex-col gap-1" data-node-id="ID132">
+              <span class="font-bold text-amber-300">💡 ID132 - Registro quita ansiedad</span>
+              <span class="text-[10px] text-slate-400 line-clamp-1">Monitoreo diario de incidencias: "Todo estuvo bien".</span>
+            </button>
+
+            <button class="seed-focus-trigger text-left p-2.5 rounded-xl border border-amber-500/10 hover:border-amber-500/30 bg-amber-500/5 hover:bg-amber-500/10 transition-all flex flex-col gap-1" data-node-id="ID157">
+              <span class="font-bold text-amber-300">💡 ID157 - Validación de no-riesgos</span>
+              <span class="text-[10px] text-slate-400 line-clamp-1">Advertir al cuidador sobre puntos ciegos para mejorar.</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- View 4 Pedagogical Frontiers Container -->
+        <div id="methodology-frontiers-container" class="hidden flex flex-col gap-4 animate-fade-in">
+          <div class="border-b border-white/5 pb-2">
+            <h3 class="text-[10px] font-bold tracking-wider text-rose-400 uppercase flex items-center gap-1.5">
+              <i data-lucide="flame" class="text-rose-400"></i> Las Provocaciones Extremas
+            </h3>
+            <p class="text-[10px] text-slate-400 mt-1 leading-relaxed">3 ideas de provocación radical y conceptualmente 'locas' elegidas para desarmar la paradoja moral.</p>
+          </div>
+
+          <div class="flex flex-col gap-2.5 text-xs text-slate-300">
+            <p class="leading-relaxed">Al no limitarse por la viabilidad comercial, revelan los deseos tácitos más profundos del usuario. Elige un faro frontera para analizar su verdad revelada:</p>
+            
+            <button class="frontier-focus-trigger text-left p-3 rounded-xl border border-rose-500/10 hover:border-rose-500/30 bg-rose-500/5 hover:bg-rose-500/10 transition-all flex flex-col gap-1" data-node-id="ID184">
+              <div class="flex justify-between items-center w-full">
+                <span class="font-bold text-rose-300">🔥 ID184 - Clon Emocional</span>
+                <span class="text-[8px] bg-rose-500/10 text-rose-300 border border-rose-500/20 px-1 py-0.5 rounded">Vínculo IA</span>
+              </div>
+              <span class="text-[10px] text-slate-400 leading-normal">IA de voz profunda entrenada con las rutinas afectivas del cuidador.</span>
+            </button>
+
+            <button class="frontier-focus-trigger text-left p-3 rounded-xl border border-rose-500/10 hover:border-rose-500/30 bg-rose-500/5 hover:bg-rose-500/10 transition-all flex flex-col gap-1" data-node-id="ID143">
+              <div class="flex justify-between items-center w-full">
+                <span class="font-bold text-rose-300">🔥 ID143 - Certificado Bienestar</span>
+                <span class="text-[8px] bg-rose-500/10 text-rose-300 border border-rose-500/20 px-1 py-0.5 rounded">Absolución</span>
+              </div>
+              <span class="text-[10px] text-slate-400 leading-normal">Un ritual o reporte legal de retorno que asume la responsabilidad legal y moral.</span>
+            </button>
+
+            <button class="frontier-focus-trigger text-left p-3 rounded-xl border border-rose-500/10 hover:border-rose-500/30 bg-rose-500/5 hover:bg-rose-500/10 transition-all flex flex-col gap-1" data-node-id="ID75">
+              <div class="flex justify-between items-center w-full">
+                <span class="font-bold text-rose-300">🔥 ID75 - Entrega de Guardia</span>
+                <span class="text-[8px] bg-rose-500/10 text-rose-300 border border-rose-500/20 px-1 py-0.5 rounded">Protocolo</span>
+              </div>
+              <span class="text-[10px] text-slate-400 leading-normal">Protocolo formal digital-humano de traspaso riguroso de guardia médica.</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- View 5 Pedagogical Embudo Container -->
+        <div id="methodology-funnel-container" class="hidden flex flex-col gap-4">
+          <div class="border-b border-white/5 pb-2">
+            <h3 class="text-[10px] font-bold tracking-wider text-slate-400 uppercase flex items-center gap-1.5">
+              <i data-lucide="git-commit" class="text-blue-400"></i> El Embudo de Convergencia
+            </h3>
+            <p class="text-[10px] text-slate-400 mt-1 leading-relaxed">¿Cómo pasamos de 254 ideas sueltas a la propuesta ganadora?</p>
+          </div>
+
+          <div class="flex flex-col gap-3 text-xs">
+            <!-- Step 1 -->
+            <div class="flex gap-2.5">
+              <div class="flex flex-col items-center">
+                <span class="w-5 h-5 rounded-full bg-slate-800 text-[10px] font-bold flex items-center justify-center border border-white/10 text-slate-300">1</span>
+                <div class="w-px h-full bg-gradient-to-b from-slate-700 to-blue-500/30 my-1"></div>
+              </div>
+              <div class="flex-1">
+                <p class="font-bold text-white">Divergencia (254)</p>
+                <p class="text-[10px] text-slate-400 mt-0.5 leading-relaxed">La exploración inicial de todos los territorios del cuidado.</p>
+              </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="flex gap-2.5">
+              <div class="flex flex-col items-center">
+                <span class="w-5 h-5 rounded-full bg-blue-500/10 text-[10px] font-bold flex items-center justify-center border border-blue-500/30 text-blue-400">2</span>
+                <div class="w-px h-full bg-gradient-to-b from-blue-500/30 to-purple-500/30 my-1"></div>
+              </div>
+              <div class="flex-1">
+                <p class="font-bold text-white">Tensión Dialéctica</p>
+                <p class="text-[10px] text-slate-400 mt-0.5 leading-relaxed">
+                  Cruzamos las <strong class="text-amber-400">17 Semillas</strong> (lo realista) con las <strong class="text-rose-400">3 Fronteras</strong> (lo provocativo).
+                </p>
+              </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="flex gap-2.5">
+              <div class="flex flex-col items-center">
+                <span class="w-5 h-5 rounded-full bg-purple-500/20 text-[10px] font-bold flex items-center justify-center border border-purple-500/40 text-purple-300 animate-pulse">3</span>
+                <div class="w-px h-full bg-gradient-to-b from-purple-500/30 to-emerald-500/30 my-1"></div>
+              </div>
+              <div class="flex-1">
+                <p class="font-bold text-white">Pilares de Traducción</p>
+                <p class="text-[10px] text-slate-400 mt-0.5 leading-relaxed">
+                  Los <strong class="text-blue-300">3 círculos centrales</strong> en pantalla. No son ideas; son puentes que traducen esa tensión en valor.
+                </p>
+              </div>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="flex gap-2.5">
+              <div class="flex flex-col items-center">
+                <span class="w-5 h-5 rounded-full bg-emerald-500/20 text-[10px] font-bold flex items-center justify-center border border-emerald-500/40 text-emerald-300">4</span>
+              </div>
+              <div class="flex-1">
+                <p class="font-bold text-white">Consolidación</p>
+                <p class="text-[10px] text-slate-400 mt-0.5 leading-relaxed">Nacen las <strong class="text-emerald-400">4 propuestas finales</strong> listas para prototipar.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="glass-panel p-3 rounded-xl border-blue-500/20 bg-blue-950/10 text-[10px] text-slate-300 leading-relaxed mt-1.5 flex items-start gap-1.5">
+            <i data-lucide="help-circle" class="w-4 h-4 text-blue-400 shrink-0"></i>
+            <span>Haz clic en cualquiera de los tres <strong>Pilares de Traducción</strong> en el cosmos central para ver qué ideas los nutren y qué resuelven.</span>
+          </div>
+        </div>
+
+        <!-- Custom legend for visual elements -->
+        <div class="pt-4 border-t border-white/5">
+          <h3 class="text-[10px] font-bold tracking-wider text-slate-400 uppercase mb-2">Simbología Especial</h3>
+          <div class="flex flex-col gap-2.5 text-xs text-slate-300">
+            <div class="flex items-center gap-2.5">
+              <span class="w-3.5 h-3.5 rounded-full bg-amber-400 flex items-center justify-center text-[8px] font-bold text-slate-950 shadow-md shadow-amber-500/20">💡</span>
+              <div>
+                <p class="font-semibold text-white">Idea Semilla</p>
+                <p class="text-[10px] text-slate-400">Nodos de convergencia natural</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2.5">
+              <span class="w-3.5 h-3.5 rounded-full bg-rose-500 flex items-center justify-center text-[8px] font-bold text-slate-950 shadow-md shadow-rose-500/20">🔥</span>
+              <div>
+                <p class="font-semibold text-white">Idea Frontera</p>
+                <p class="text-[10px] text-slate-400">Concepto extremo para análisis</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2.5">
+              <span class="w-3.5 h-3.5 rounded-full bg-emerald-400 flex items-center justify-center text-[8px] font-bold text-slate-950 shadow-md shadow-emerald-500/20">🏆</span>
+              <div>
+                <p class="font-semibold text-white">Idea Ganadora</p>
+                <p class="text-[10px] text-slate-400">Solución integrada seleccionada</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CENTER PANEL -->
+    <section class="flex-1 h-full relative overflow-hidden bg-slate-950/20 flex flex-col">
+      
+      <!-- Canvas Zoom / Instructions bar -->
+      <div class="absolute top-4 left-4 z-20 flex flex-wrap gap-2 items-center">
+        <div class="glass-panel px-3 py-1.5 rounded-lg text-[10px] text-slate-400 flex items-center gap-2">
+          <i data-lucide="mouse-pointer" class="w-3.5 h-3.5 text-blue-400"></i>
+          <span>Usa scroll para hacer zoom y arrastra el espacio</span>
+        </div>
+        <button id="reset-zoom-btn" class="glass-panel px-3 py-1.5 rounded-lg text-[10px] text-slate-300 hover:text-white flex items-center gap-1.5 hover:bg-white/5 transition-all">
+          <i data-lucide="maximize" class="w-3.5 h-3.5"></i> Reajustar Vista
+        </button>
+
+        <!-- Concept Filter Active Badge (Floating Pill) -->
+        <div id="active-concept-filter-badge" class="hidden glass-panel px-3 py-1.5 rounded-lg text-[10px] text-slate-200 flex items-center gap-2 border-blue-500/30 bg-slate-950/90 shadow-lg">
+          <span class="w-1.5 h-1.5 rounded-full bg-blue-400 animate-ping"></span>
+          <span>Filtro de Concepto: <strong id="active-concept-filter-name" class="text-blue-300">Concepto</strong></span>
+          <button id="clear-concept-filter-btn" class="ml-1 text-[9px] text-rose-400 hover:text-rose-300 font-bold hover:underline">Quitar</button>
+        </div>
+      </div>
+
+      <!-- D3 Interactive Graph Area -->
+      <div id="canvas-container" class="flex-1 w-full h-full cursor-grab active:cursor-grabbing"></div>
+
+      <!-- Live Interactive Narrative Bar -->
+      <footer class="absolute bottom-4 left-4 right-4 z-20 glass-panel p-3 rounded-xl border-white/5 flex flex-col md:flex-row justify-between items-start md:items-center gap-2 bg-slate-950/90">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-blue-500 animate-ping"></span>
+          <p id="live-narrative" class="text-xs text-slate-300">Explora el cosmos interactivo. Selecciona un nodo para revelar su potencial.</p>
+        </div>
+        <div class="flex items-center gap-2 text-[10px] text-slate-400">
+          <i data-lucide="info" class="w-3.5 h-3.5 text-slate-400"></i>
+          <span>Click en nodos naranjas/semilla para expandir</span>
+        </div>
+      </footer>
+    </section>
+
+    <!-- RIGHT PANEL: Integrated Collapsible Inspect Drawer & Dynamic Tour metrics -->
+    <section id="right-panel" class="w-0 border-l-0 opacity-0 flex flex-col overflow-hidden bg-slate-950/50 backdrop-blur-sm shrink-0 transition-all duration-300">
+      
+      <!-- Right panel navigation tab -->
+      <div class="flex border-b border-white/5 bg-slate-950/80">
+        <button id="tab-inspect" class="flex-1 py-3 text-xs font-bold tracking-wider uppercase border-b-2 border-blue-500 text-blue-400 flex items-center justify-center gap-1.5">
+          <i data-lucide="zoom-in" class="w-4 h-4"></i> Inspección de Ideas
+        </button>
+      </div>
+
+      <!-- Detail Inspector Content -->
+      <div id="panel-inspect" class="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
+        
+        <!-- Welcome / State indicator when nothing is selected -->
+        <div id="inspect-empty" class="h-full flex flex-col items-center justify-center text-center p-6 text-slate-500 my-auto">
+          <div class="w-16 h-16 rounded-full border-2 border-dashed border-slate-700 flex items-center justify-center mb-4">
+            <i data-lucide="fingerprint" class="w-8 h-8 text-slate-600 animate-pulse"></i>
+          </div>
+          <p class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Sin Selección</p>
+          <p class="text-[11px] leading-relaxed">Selecciona o haz hover sobre cualquier idea del universo para ver la ficha detallada.</p>
+        </div>
+
+        <!-- Dynamic Tour Metrics HUD (Visible only when Tour is Active) -->
+        <div id="tour-metrics-panel" class="hidden flex-col gap-4 p-4 rounded-xl border border-blue-500/20 bg-blue-950/10">
+          <h4 class="text-[10px] font-black uppercase tracking-wider text-blue-400 flex items-center gap-1">
+            <i data-lucide="bar-chart-3"></i> Evaluación Estratégica de Fase
+          </h4>
+          <div class="flex flex-col gap-3">
+            <!-- Novedad -->
+            <div>
+              <div class="flex justify-between text-[11px] font-semibold text-slate-300 mb-1">
+                <span>Novedad Disruptiva</span>
+                <span id="metric-novedad-val" class="text-blue-400">3 / 5</span>
+              </div>
+              <div class="w-full bg-slate-800 rounded-full h-1.5">
+                <div id="metric-novedad-bar" class="bg-blue-500 h-1.5 rounded-full transition-all duration-500" style="width: 60%"></div>
+              </div>
+            </div>
+            <!-- Factibilidad Técnica -->
+            <div>
+              <div class="flex justify-between text-[11px] font-semibold text-slate-300 mb-1">
+                <span>Factibilidad Técnica</span>
+                <span id="metric-fact-val" class="text-teal-400">3 / 5</span>
+              </div>
+              <div class="w-full bg-slate-800 rounded-full h-1.5">
+                <div id="metric-fact-bar" class="bg-teal-500 h-1.5 rounded-full transition-all duration-500" style="width: 60%"></div>
+              </div>
+            </div>
+            <!-- Viabilidad de Negocio -->
+            <div>
+              <div class="flex justify-between text-[11px] font-semibold text-slate-300 mb-1">
+                <span>Viabilidad de Negocio</span>
+                <span id="metric-viab-val" class="text-purple-400">3 / 5</span>
+              </div>
+              <div class="w-full bg-slate-800 rounded-full h-1.5">
+                <div id="metric-viab-bar" class="bg-purple-500 h-1.5 rounded-full transition-all duration-500" style="width: 60%"></div>
+              </div>
+            </div>
+            <!-- Deseabilidad de Usuario -->
+            <div>
+              <div class="flex justify-between text-[11px] font-semibold text-slate-300 mb-1">
+                <span>Deseabilidad</span>
+                <span id="metric-deseo-val" class="text-amber-400">3 / 5</span>
+              </div>
+              <div class="w-full bg-slate-800 rounded-full h-1.5">
+                <div id="metric-deseo-bar" class="bg-amber-500 h-1.5 rounded-full transition-all duration-500" style="width: 60%"></div>
+              </div>
+            </div>
+            <!-- Impacto real en Culpa -->
+            <div>
+              <div class="flex justify-between text-[11px] font-semibold text-slate-300 mb-1">
+                <span>Impacto en la Culpa</span>
+                <span id="metric-impacto-val" class="text-rose-400">3 / 5</span>
+              </div>
+              <div class="w-full bg-slate-800 rounded-full h-1.5">
+                <div id="metric-impacto-bar" class="bg-rose-500 h-1.5 rounded-full transition-all duration-500" style="width: 60%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Populated card detail -->
+        <div id="inspect-content" class="hidden flex flex-col gap-4">
+          <div class="p-4 rounded-xl border border-white/5 bg-slate-900/30 flex flex-col gap-3 relative overflow-hidden">
+            <div class="absolute -right-10 -top-10 w-24 h-24 bg-blue-500/5 rounded-full filter blur-2xl"></div>
+            
+            <div class="flex justify-between items-start gap-2">
+              <span id="inspect-id" class="text-[10px] font-black tracking-widest text-blue-400 uppercase bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20">ID-X</span>
+              <div id="inspect-badges" class="flex flex-wrap gap-1">
+                <!-- Badges injected automatically -->
+              </div>
+            </div>
+
+            <h3 id="inspect-idea-text" class="text-base font-bold text-white leading-snug">
+              Idea text placeholder
+            </h3>
+
+            <div>
+              <span id="inspect-cluster-badge" class="inline-block text-[9px] font-bold tracking-wider uppercase px-2 py-1 rounded bg-slate-800 text-slate-300 border border-white/5">
+                Cluster
+              </span>
+            </div>
+          </div>
+
+          <!-- Deep analysis details -->
+          <div class="flex flex-col gap-3">
+            <!-- SPECIAL FRONTIER DEEP BLOCK -->
+            <div id="inspect-frontier-block" class="hidden flex flex-col gap-3">
+              <div class="glass-panel p-3.5 rounded-xl border-amber-500/20 bg-amber-950/10">
+                <h4 class="text-[10px] font-bold text-amber-400 uppercase mb-1.5 tracking-wider flex items-center gap-1">
+                  <i data-lucide="help-circle" class="w-3.5 h-3.5 text-amber-400"></i> ¿Por qué es loca?
+                </h4>
+                <p id="inspect-frontier-why" class="text-xs text-slate-300 leading-relaxed"></p>
+              </div>
+              <div class="glass-panel p-3.5 rounded-xl border-rose-500/20 bg-rose-950/10">
+                <h4 class="text-[10px] font-bold text-rose-400 uppercase mb-1.5 tracking-wider flex items-center gap-1">
+                  <i data-lucide="key-round" class="w-3.5 h-3.5 text-rose-400"></i> ¿Qué revela?
+                </h4>
+                <p id="inspect-frontier-reveal" class="text-xs text-slate-300 leading-relaxed"></p>
+              </div>
+              <div class="glass-panel p-3 rounded-xl border-white/5 bg-slate-900/10">
+                <h4 class="text-[10px] font-bold text-slate-400 uppercase mb-1.5 tracking-wider flex items-center gap-1">
+                  <i data-lucide="tags" class="w-3.5 h-3.5 text-slate-400"></i> Conceptos Asociados
+                </h4>
+                <div id="inspect-frontier-keywords" class="flex flex-wrap gap-1.5 mt-1"></div>
+              </div>
+            </div>
+
+            <div class="glass-panel p-3.5 rounded-xl border-white/5">
+              <h4 class="text-[10px] font-bold text-slate-400 uppercase mb-1.5 tracking-wider flex items-center gap-1">
+                <i data-lucide="book-open" class="w-3.5 h-3.5 text-blue-400"></i> Comentario de Diseño
+              </h4>
+              <p id="inspect-comment" class="text-xs text-slate-300 leading-relaxed">No hay comentario registrado para este nodo.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- SPECIAL VIEW 6 OVERLAY: Fully Polished Ranked Grid and Showcase -->
+  <div id="ranked-overlay-container" class="absolute inset-0 bg-slate-950/95 backdrop-blur-md z-30 hidden overflow-y-auto p-6 md:p-12 flex flex-col items-center">
+    <div class="max-w-6xl w-full flex flex-col gap-6">
+      
+      <!-- Overlay header -->
+      <div class="flex justify-between items-center border-b border-white/10 pb-4">
+        <div class="flex items-center gap-3">
+          <div class="p-2.5 bg-rose-500/10 rounded-xl border border-rose-500/30 text-rose-400">
+            <i data-lucide="award" class="w-6 h-6 animate-pulse"></i>
+          </div>
+          <div>
+            <h2 class="font-black text-xl md:text-3xl text-white tracking-tight">Estrategia de Solución Unificada</h2>
+            <p class="text-xs text-slate-400 font-medium">Convergencia de las ideas semilla y fronteras en 4 conceptos articulados</p>
+          </div>
+        </div>
+        <button id="close-ranked-overlay" class="px-4 py-2 bg-slate-900 border border-white/10 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-white/5 flex items-center gap-2 transition-all">
+          <i data-lucide="arrow-left" class="w-4 h-4"></i> Volver al Universo
+        </button>
+      </div>
+
+      <!-- Winning Idea Main Banner Showcase -->
+      <div class="glass-panel p-6 md:p-8 rounded-2xl border-rose-500/30 bg-gradient-to-br from-rose-950/20 via-slate-900/80 to-blue-950/20 shadow-2xl shadow-rose-500/5 relative overflow-hidden flex flex-col md:flex-row gap-6 items-center">
+        <div class="absolute -right-24 -top-24 w-72 h-72 bg-rose-500/10 rounded-full filter blur-3xl pulse-glow"></div>
+        <div class="absolute -left-24 -bottom-24 w-72 h-72 bg-blue-500/10 rounded-full filter blur-3xl pulse-glow" style="animation-delay: -1.5s;"></div>
+        
+        <div class="flex-1 flex flex-col gap-4 relative z-10 w-full">
+          <div class="flex justify-between items-center w-full">
+            <div class="flex items-center gap-2">
+              <span class="text-[10px] font-black tracking-widest text-rose-400 bg-rose-500/15 border border-rose-500/30 px-3 py-1 rounded-full uppercase flex items-center gap-1">
+                🏆 GANADORA ABSOLUTA
+              </span>
+              <span class="text-[10px] text-slate-400 font-medium">Concepto #1 integrado</span>
+            </div>
+            <button class="explore-concept-btn px-4 py-1.5 border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 text-[10px] font-bold uppercase tracking-wider rounded-lg transition-all" data-concept="Concepto #1">
+              Ver ideas fuente
+            </button>
+          </div>
+          <h3 class="font-black text-2xl md:text-3xl text-white leading-tight mt-3">
+            1. Sistema de traspaso de guardia con protocolo de salida y retorno (turno seguro)
+          </h3>
+          <p class="text-xs text-slate-300 leading-relaxed max-w-5xl mt-1">
+            Una plataforma que convierte el acto de "salir" en un ritual estructurado de tres momentos: activación, ausencia y cierre de turno. El sistema ejecuta un checklist contextual automático de salida (ej. verificar cocina apagada, estado de medicación y conectividad) para devolver a Andrea una confirmación clara: "Todo listo. Puedes salir." Durante la ausencia, no bombardea con alertas molestas y solo interviene bajo un estricto algoritmo de severidad. Al regresar, entrega un resumen narrativo deliberadamente emocional: "Tu mamá estuvo tranquila. No necesitabas estar."
+          </p>
+          <div class="flex flex-wrap gap-2 text-xs mt-3">
+            <span class="px-2.5 py-1 rounded bg-slate-900 border border-white/10 text-slate-300">🛡️ Monitoreo No-Invasivo</span>
+            <span class="px-2.5 py-1 rounded bg-slate-900 border border-white/10 text-slate-300">🔑 Protocolo Transmisión de Guardia</span>
+            <span class="px-2.5 py-1 rounded bg-slate-900 border border-white/10 text-slate-300">💬 Feedback de Paz Mental</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ranked Concepts Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Concept 2 -->
+        <div class="glass-panel p-5 rounded-2xl border-white/10 flex flex-col justify-between hover:border-blue-500/30 transition-all duration-300 hover:-translate-y-1">
+          <div class="flex flex-col gap-3">
+            <div class="flex justify-between items-center">
+              <span class="text-[10px] font-black bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded border border-blue-500/20">CONCEPTO #2</span>
+              <span class="text-xs text-slate-500">Normalidad Activa</span>
+            </div>
+            <h4 class="font-bold text-base text-white">2. Sistema de bienestar conductual que transforma patrones en certeza</h4>
+            <p class="text-[11px] text-slate-400 leading-relaxed">
+              Construye una línea base personalizada para emitir señales de normalidad activa en lugar de alarmas estresantes. Entrega reportes de tendencias positivas y un índice de autonomía segura para gestionar la culpa anticipada.
+            </p>
+          </div>
+          <button class="explore-concept-btn mt-4 w-full py-2 border border-white/5 hover:border-blue-500/20 text-[10px] font-bold uppercase tracking-wider text-slate-300 hover:text-blue-400 rounded-lg transition-all" data-concept="Concepto #2">
+            Ver ideas fuente
+          </button>
+        </div>
+
+        <!-- Concept 3 -->
+        <div class="glass-panel p-5 rounded-2xl border-white/10 flex flex-col justify-between hover:border-blue-500/30 transition-all duration-300 hover:-translate-y-1">
+          <div class="flex flex-col gap-3">
+            <div class="flex justify-between items-center">
+              <span class="text-[10px] font-black bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded border border-blue-500/20">CONCEPTO #3</span>
+              <span class="text-xs text-slate-500">Voz Compartida</span>
+            </div>
+            <h4 class="font-bold text-base text-white">3. Asistente de presencia activa que acompaña, guía y previene</h4>
+            <p class="text-[11px] text-slate-400 leading-relaxed">
+              Un puente emocional interactivo con modos 'Andrea en Casa' y 'Andrea Ausente'. Realiza chequeos conversacionales pasivos, recuerda rutinas críticas y asume el rol de voz de seguridad preventiva en el hogar.
+            </p>
+          </div>
+          <button class="explore-concept-btn mt-4 w-full py-2 border border-white/5 hover:border-blue-500/20 text-[10px] font-bold uppercase tracking-wider text-slate-300 hover:text-blue-400 rounded-lg transition-all" data-concept="Concepto #3">
+            Ver ideas fuente
+          </button>
+        </div>
+
+        <!-- Concept 4 -->
+        <div class="glass-panel p-5 rounded-2xl border-white/10 flex flex-col justify-between hover:border-blue-500/30 transition-all duration-300 hover:-translate-y-1">
+          <div class="flex flex-col gap-3">
+            <div class="flex justify-between items-center">
+              <span class="text-[10px] font-black bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded border border-blue-500/20">CONCEPTO #4</span>
+              <span class="text-xs text-slate-500">Estructura Cognitiva</span>
+            </div>
+            <h4 class="font-bold text-base text-white">4. Compañero conversacional con memoria cognitiva activa y señal de estado para el cuidador</h4>
+            <p class="text-[11px] text-slate-400 leading-relaxed">
+              Dispositivo con tres capas de análisis cognitivo. Estudia la memoria de bienestar habitual, detecta variaciones sutiles conversacionales y redacta resúmenes periódicos emocionales para reducir la soledad.
+            </p>
+          </div>
+          <button class="explore-concept-btn mt-4 w-full py-2 border border-white/5 hover:border-blue-500/20 text-[10px] font-bold uppercase tracking-wider text-slate-300 hover:text-blue-400 rounded-lg transition-all" data-concept="Concepto #4">
+            Ver ideas fuente
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error or feedback Toast -->
+  <div id="toast" class="absolute bottom-6 left-6 z-50 glass-panel-heavy py-3 px-5 rounded-xl border-rose-500/30 shadow-lg shadow-rose-500/10 text-xs text-slate-200 hidden flex items-center gap-3 transition-all">
+    <div class="p-1 rounded-full bg-rose-500/15 text-rose-400">
+      <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+    </div>
+    <span id="toast-message">Este es un mensaje de alerta</span>
+  </div>
+
+  <script>
+    // ============================================================
+    // THE EXTENSIONAL DATASET
+    // ============================================================
+    const DATA = [{"id": "ID1", "idea": "no solo visual, sonido, y otro que se pueda. te quedas tranquilo con el monitoreo general", "cluster": "Monitoreo y Seguridad", "mitiga": "Si", "comentario": "Sistema que monitorea el ambiente. Mitiga la culpa porque el cuidador está atento a lo que ocurre y puede saberlo.", "marca": ""}, {"id": "ID2", "idea": "ayuda visual", "cluster": "Monitoreo y Seguridad", "mitiga": "Si", "comentario": "Sistema que monitorea el ambiente. Reduce el tiempo de reacción ante una emergency", "marca": ""}, {"id": "ID3", "idea": "claridad mental", "cluster": "Salud Mental y Regulación Emocional", "mitiga": "No", "comentario": "Apunta a la culpa de despriorizarse", "marca": ""}, {"id": "ID4", "idea": "Cuidador suplente exclusivo para esa persona mayor", "cluster": "Delegación y Reemplazo", "mitiga": "No", "comentario": "Apoya al cuidador para poder priorizar algunas cosas de su rutina", "marca": ""}, {"id": "ID5", "idea": "Información de validación de momentos de bienestar de la persona cuidada cada ciertos minutos", "cluster": "Validación Emocional", "mitiga": "Si", "comentario": "Sistema que permite validar que todo está bien mientras no estoy pendiente.", "marca": ""}, {"id": "ID6", "idea": "Gerente del cuidado y no quien planifica o ejecuta", "cluster": "Delegación y Reemplazo", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID7", "idea": "Planificación de actividades independientes", "cluster": "Descanso y Bienestar del Cuidador", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID8", "idea": "Agenda de cuidados y tiempos disponibles", "cluster": "Descanso y Bienestar del Cuidador", "mitiga": "No", "comentario": "Sistema que le permite organizar los tiempos al cuidador", "marca": ""}, {"id": "ID9", "idea": "1. Sistema de traspaso de guardia con protocolo de salida y retorno (turno seguro)", "cluster": "Monitoreo y Seguridad", "mitiga": "Si", "comentario": "Permite al cuidador abandonar por tiempo limitado, resguardando a la persona mayor.", "marca": "x"}, {"id": "ID10", "idea": "Desafios de desconexión", "cluster": "Descanso y Bienestar del Cuidador", "mitiga": "No", "comentario": "Busca propiciar espacios de desconexión del cuidado", "marca": ""}, {"id": "ID11", "idea": "Wearable de alivio", "cluster": "Validación Emocional", "mitiga": "Si", "comentario": "Objeto que entrega feedback sensorial al momento de que se detecta una action o estado positivo en el adulto mayor", "marca": ""}, {"id": "ID12", "idea": "Red de apoyo", "cluster": "Coordinación y Red de Apoyo", "mitiga": "Si", "comentario": "Permite delegar en una persona de confianza en momentos de emergencia.", "marca": ""}, {"id": "ID13", "idea": "Registro de acciones", "cluster": "Otros", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID14", "idea": "Tiempo libre propio", "cluster": "Descanso y Bienestar del Cuidador", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID15", "idea": "Saber sobre cómo está la persona mayor en tiempo real", "cluster": "Monitoreo y Seguridad", "mitiga": "Si", "comentario": "", "marca": ""}, {"id": "ID16", "idea": "Descargar responsabilidad", "cluster": "Descanso y Bienestar del Cuidador", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID17", "idea": "Contar con apoyo en emergencies", "cluster": "Coordinación y Red de Apoyo", "mitiga": "Si", "comentario": "Similar a red de apoyo", "marca": ""}, {"id": "ID18", "idea": "simulador de presencia", "cluster": "Delegación y Reemplazo", "mitiga": "Si", "comentario": "Permite hacer una extensión del cuidador en la casa.", "marca": ""}, {"id": "ID19", "idea": "comunidad de contactos familiares", "cluster": "Coordinación y Red de Apoyo", "mitiga": "Si", "comentario": "Similar a red de apoyo", "marca": ""}, {"id": "ID20", "idea": "no andar corriendo para todos lados", "cluster": "Otros", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID21", "idea": "coordinador/monitor que te reemplace en el hogar", "cluster": "Delegación y Reemplazo", "mitiga": "Si", "comentario": "Similar a red apoyo and simulador de presencia", "marca": ""}, {"id": "ID22", "idea": "Alarma de momentos potencialmente riesgosos", "cluster": "Monitoreo y Seguridad", "mitiga": "Si", "comentario": "Sistema con detección de patrones and habilitaciones de espacios que puedan poner en riesgo el cuidado.", "marca": ""}, {"id": "ID23", "idea": "no llegar sin saber al momento de...", "cluster": "Educación y Entrenamiento para Cuidar Mejor", "mitiga": "Si", "comentario": "Sistema que guía al cuidador en el proceso del cuidado", "marca": ""}, {"id": "ID24", "idea": "Espacios de autocuidado", "cluster": "Descanso y Bienestar del Cuidador", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID25", "idea": "Detectar potenciales riesgos que el cuidador no visualiza", "cluster": "Monitoreo y Seguridad", "mitiga": "Si", "comentario": "Sistema con detección de patrones and habilitaciones de espacios.", "marca": ""}, {"id": "ID26", "idea": "recordatorio de despreocupacion", "cluster": "Descanso y Bienestar del Cuidador", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID27", "idea": "Gestión de la rutina del cuidador", "cluster": "Descanso y Bienestar del Cuidador", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID28", "idea": "Gestión de la rutina de la persona cuidada", "cluster": "Delegación y Reemplazo", "mitiga": "Si", "comentario": "Permite anticipar aspectos rutinarios y evaluar su impacto en el vivir de la persona cuidada.", "marca": ""}, {"id": "ID29", "idea": "Espacios recreativos con asistencia", "cluster": "Autonomía de la Persona Mayor", "mitiga": "No", "comentario": "Red física que permite dejar al adulto mayor por X tiempo.", "marca": ""}, {"id": "ID30", "idea": "Calendario familiar compartido", "cluster": "Coordinación y Red de Apoyo", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID31", "idea": "Poder prevenir situaciones", "cluster": "Monitoreo y Seguridad", "mitiga": "Si", "comentario": "Sistema con detección de patrones para prevenir riesgos.", "marca": ""}, {"id": "ID32", "idea": "Centinela mode On por 1-2 hours max", "cluster": "Monitoreo y Seguridad", "mitiga": "Si", "comentario": "Permite al cuidador abandonar por tiempo limitado.", "marca": "x"}, {"id": "ID33", "idea": "Cronometro del tiempo de cuidado", "cluster": "Descanso y Bienestar del Cuidador", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID34", "idea": "Padrinos o madrinas de culpa", "cluster": "Coordinación y Red de Apoyo", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID35", "idea": "Apoyo mental", "cluster": "Salud Mental y Regulación Emocional", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID36", "idea": "ayuda de psicologo", "cluster": "Salud Mental y Regulación Emocional", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID37", "idea": "Castigo", "cluster": "Descanso y Bienestar del Cuidador", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID38", "idea": "Medidor de entrega", "cluster": "Validación Emocional", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID39", "idea": "juntarse con los amigos", "cluster": "Descanso y Bienestar del Cuidador", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID40", "idea": "Acompañamiento de psicoterapia", "cluster": "Salud Mental y Regulación Emocional", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID41", "idea": "Privilegiar al cuidador por sobre la persona adulta cuidada", "cluster": "Descanso y Bienestar del Cuidador", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID42", "idea": "disminucion de la incertidumbre", "cluster": "Reducción de Incertidumbre", "mitiga": "Si", "comentario": "Sistema con detección de patrones para reducir incertidumbre.", "marca": ""}, {"id": "ID43", "idea": "quitar peso de estar presente", "cluster": "Coordinación y Red de Apoyo", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID44", "idea": "preparacion previa a lo que ocurra", "cluster": "Reducción de Incertidumbre", "mitiga": "Si", "comentario": "Sistema con detección de patrones para preparación previa.", "marca": ""}, {"id": "ID45", "idea": "Escaner", "cluster": "Monitoreo y Seguridad", "mitiga": "Si", "comentario": "Sistema con detección de patrones para escanear riesgos.", "marca": ""}, {"id": "ID46", "idea": "Educación sobre el rol del cuidado y los limites", "cluster": "Educación y Entrenamiento para Cuidar Mejor", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID47", "idea": "Acompañamentos médicos y/o quehaceres básicos guiados", "cluster": "Educación y Entrenamiento para Cuidar Mejor", "mitiga": "Si", "comentario": "Educación preventiva y proactiva para prevenir fallas", "marca": ""}, {"id": "ID48", "idea": "Informar que dentro del cuidado deben haber momentos de pausas activas para el cuidador", "cluster": "Educación y Entrenamiento para Cuidar Mejor", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID49", "idea": "Guía de avances del cuidado", "cluster": "Educación y Entrenamiento para Cuidar Mejor", "mitiga": "Si", "comentario": "Educación preventiva y proactiva para prevenir fallas", "marca": ""}, {"id": "ID50", "idea": "Ojos en el hogar", "cluster": "Monitoreo y Seguridad", "mitiga": "Si", "comentario": "Sistema con detección de patrones en el hogar.", "marca": ""}, {"id": "ID51", "idea": "Central satelital de monitoreo", "cluster": "Monitoreo y Seguridad", "mitiga": "Si", "comentario": "Sistema central de monitoreo con detección de patrones.", "marca": ""}, {"id": "ID52", "idea": "Guia de anticipaciones (niveles de dependencia)", "cluster": "Reducción de Incertidumbre", "mitiga": "Si", "comentario": "Educación preventiva para prevenir fallas", "marca": ""}, {"id": "ID53", "idea": "Coordinación familiar", "cluster": "Coordinación y Red de Apoyo", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID54", "idea": "Disminuir los riesgos en los hogares", "cluster": "Reducción de Incertidumbre", "mitiga": "Si", "comentario": "Sistema con detección de patrones para reducir riesgos.", "marca": ""}, {"id": "ID55", "idea": "apoyo de red comunal", "cluster": "Coordinación y Red de Apoyo", "mitiga": "Si", "comentario": "Similar a red de apoyo", "marca": ""}, {"id": "ID56", "idea": "Golpe de realidad", "cluster": "Descanso y Bienestar del Cuidador", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID57", "idea": "Checklist de validación", "cluster": "Validación Emocional", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID58", "idea": "Conocimientos básicos y espécificos del cuidado", "cluster": "Educación y Entrenamiento para Cuidar Mejor", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID59", "idea": "Disminuir los riesgos de coordination", "cluster": "Coordinación y Red de Apoyo", "mitiga": "Si", "comentario": "Similar a red de apoyo, tecnología que permita disminuir fallas", "marca": ""}, {"id": "ID60", "idea": "disminuir la necesidad ser responsible", "cluster": "Educación y Entrenamiento para Cuidar Mejor", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID61", "idea": "disminuir los accesos a la informacion", "cluster": "Salud Mental y Regulación Emocional", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID62", "idea": "que te diga que estas haciendolo bien cumpliste", "cluster": "Validación Emocional", "mitiga": "Si", "comentario": "Sistema que detecta momentos de felicidad y buenos cuidados. Entrega fundamento al cuidador de su buen hacer.", "marca": "x"}, {"id": "ID63", "idea": "Frases de validación emocional de su rendimiento como cuidador", "cluster": "Validación Emocional", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID64", "idea": "Reforzamiento de actions positives", "cluster": "Validación Emocional", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID65", "idea": "Evaluación de riesgos físicos", "cluster": "Reducción de Incertidumbre", "mitiga": "Si", "comentario": "Sistema con detección de patrones para evaluar riesgos físicos.", "marca": ""}, {"id": "ID66", "idea": "\"uber\" de cuidadores", "cluster": "Coordinación y Red de Apoyo", "mitiga": "Si", "comentario": "Sistema que podría salvar ante emergencies o descoordinaciones urgentes", "marca": "x"}, {"id": "ID67", "idea": "Centralizador de solutions", "cluster": "Monitoreo y Seguridad", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID68", "idea": "evitar que sea cuidador", "cluster": "Descanso y Bienestar del Cuidador", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID69", "idea": "Educación familiar", "cluster": "Educación y Entrenamiento para Cuidar Mejor", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID70", "idea": "Disminuir los riesgos en los hogares (2)", "cluster": "Reducción de Incertidumbre", "mitiga": "Si", "comentario": "Sistema con detección de patrones para reducir riesgos.", "marca": ""}, {"id": "ID71", "idea": "Monitorear las acciones del adulto mayor", "cluster": "Monitoreo y Seguridad", "mitiga": "Si", "comentario": "Sistema con detección de patrones para monitoreo.", "marca": ""}, {"id": "ID72", "idea": "Cuidador de confianza por horas", "cluster": "Delegación y Reemplazo", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID73", "idea": "con ayuda de vecinos", "cluster": "Coordinación y Red de Apoyo", "mitiga": "Si", "comentario": "Red de apoyo vecinal", "marca": ""}, {"id": "ID74", "idea": "Activar una red comunitaria de apoyo", "cluster": "Coordinación y Red de Apoyo", "mitiga": "Si", "comentario": "Red de apoyo comunitaria", "marca": ""}, {"id": "ID75", "idea": "Inmediatez ante emergencies", "cluster": "Coordinación y Red de Apoyo", "mitiga": "Si", "comentario": "Sistema que orquesta soluciones ante una emergencia, reduciendo el tiempo de respuesta.", "marca": "x"}, {"id": "ID76", "idea": "Aprobación social", "cluster": "Validación Emocional", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID77", "idea": "Delegación total", "cluster": "Delegación y Reemplazo", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID78", "idea": "algo simple que no complique", "cluster": "Otros", "mitiga": "No", "comentario": "Cualidad", "marca": ""}, {"id": "ID79", "idea": "que registre sin necesidad de tener internet", "cluster": "Monitoreo y Seguridad", "mitiga": "No", "comentario": "Cualidad", "marca": ""}, {"id": "ID80", "idea": "Activacion de coordination al momento que el cuidador debe alejarse", "cluster": "Coordinación y Red de Apoyo", "mitiga": "Si", "comentario": "Red de apoyo al alejarse", "marca": ""}, {"id": "ID81", "idea": "Buzon de la confesión", "cluster": "Validación Emocional", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID82", "idea": "Mecanismo de communication instantanea", "cluster": "Reducción de Incertidumbre", "mitiga": "No", "comentario": "Cualidad", "marca": ""}, {"id": "ID83", "idea": "no estás solo", "cluster": "Delegación y Reemplazo", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID84", "idea": "Voz de la conciencia para el cuidador", "cluster": "Validación Emocional", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID85", "idea": "Detector de felicidad en la persona mayor", "cluster": "Validación Emocional", "mitiga": "Si", "comentario": "Sistema que detecta momentos de felicidad y buenos cuidados.", "marca": ""}, {"id": "ID86", "idea": "Cuidador de confianza", "cluster": "Delegación y Reemplazo", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID87", "idea": "Habilitar hogares inteligentes", "cluster": "Monitoreo and Seguridad", "mitiga": "Si", "comentario": "Sistema con detección de patrones en hogares inteligentes.", "marca": ""}, {"id": "ID88", "idea": "Espacios de apoyo emocional a cuidadores", "cluster": "Salud Mental y Regulación Emocional", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID89", "idea": "poder dedicarse a si mismo", "cluster": "Descanso y Bienestar del Cuidador", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID90", "idea": "Aportar confianza de que lo que hace está bien", "cluster": "Validación Emocional", "mitiga": "Si", "comentario": "Sistema con detección de patrones para aportar confianza.", "marca": ""}, {"id": "ID91", "idea": "Informar ubicación en tiempo real", "cluster": "Monitoreo and Seguridad", "mitiga": "No", "comentario": "Cualidad", "marca": ""}, {"id": "ID92", "idea": "anticipatorio al momento de cuidar", "cluster": "Reducción de Incertidumbre", "mitiga": "Si", "comentario": "Sistema que permite al cuidador prepararse con contexto previo", "marca": ""}, {"id": "ID93", "idea": "Ritual de desconexión", "cluster": "Descanso y Bienestar del Cuidador", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID94", "idea": "Comparador de metas vs entrega", "cluster": "Validación Emocional", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID95", "idea": "Entregar información en tiempo real", "cluster": "Monitoreo and Seguridad", "mitiga": "Si", "comentario": "Sistema de alerts que identifica cambios de comportamiento.", "marca": ""}, {"id": "ID96", "idea": "Verificar que todo esta bien", "cluster": "Reducción de Incertidumbre", "mitiga": "Si", "comentario": "Sistema que registra momentos de no riesgo → todo está OK.", "marca": ""}, {"id": "ID97", "idea": "Compartir experiencia del cuidador", "cluster": "Validación Emocional", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID98", "idea": "Espacios de conversación con ex cuidadores", "cluster": "Coordinación y Red de Apoyo", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID99", "idea": "tener tiempo de calidad", "cluster": "Descanso y Bienestar del Cuidador", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID100", "idea": "educación para saber hacer", "cluster": "Educación y Entrenamiento para Cuidar Mejor", "mitiga": "No", "comentario": "Elementos para saber actuar ante momentos específicos.", "marca": ""}, {"id": "ID101", "idea": "Sistema de confianza", "cluster": "Monitoreo and Seguridad", "mitiga": "Si", "comentario": "Sistema que permite monitorear y quitarte el estar presente concentrado en cuidar.", "marca": "x"}, {"id": "ID102", "idea": "Feedback de buen cuidado", "cluster": "Validación Emocional", "mitiga": "Si", "comentario": "Valida actions para empoderar al cuidador y entender que lo está haciendo bien → transformar observaciones subjetivas en datos accionables.", "marca": "x"}, {"id": "ID103", "idea": "Crear espacios de proyección personal", "cluster": "Descanso y Bienestar del Cuidador", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID104", "idea": "Libertad para poder hacer cosas", "cluster": "Descanso y Bienestar del Cuidador", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID105", "idea": "poder dormir tranquilo(a)", "cluster": "Reducción de Incertidumbre", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID106", "idea": "herramienta de apoyo", "cluster": "Coordinación y Red de Apoyo", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID107", "idea": "Ceder el rol del cuidador", "cluster": "Delegación y Reemplazo", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID108", "idea": "Registro de descanso", "cluster": "Descanso y Bienestar del Cuidador", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID109", "idea": "Entrenamiento para delegar", "cluster": "Delegación y Reemplazo", "mitiga": "No", "comentario": "Sistema que transfiere la responsibility con evidencia", "marca": ""}, {"id": "ID110", "idea": "Dar una vida de calidad al cuidado", "cluster": "Autonomía de la Persona Mayor", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID111", "idea": "uso compartido (para que vean que hago algo)", "cluster": "Validación Emocional", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID112", "idea": "dedicarse a un hobbie o deporte", "cluster": "Descanso y Bienestar del Cuidador", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID113", "idea": "Acompañar en el camino de ser cuidador", "cluster": "Coordinación y Red de Apoyo", "mitiga": "Si", "comentario": "Red de apoyo en el camino del cuidado", "marca": ""}, {"id": "ID114", "idea": "creacion de espacios de encuentro (no estoy solo)", "cluster": "Coordinación y Red de Apoyo", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID115", "idea": "Poder entregarle a sus padres momentos para disfrutar", "cluster": "Autonomía de la Persona Mayor", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID116", "idea": "Validación del cuidado", "cluster": "Validación Emocional", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID117", "idea": "Desintoxicación de cuidado obsesivo", "cluster": "Salud Mental y Regulación Emocional", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID118", "idea": "perdiendo el miedo a lo desconocido", "cluster": "Reducción de Incertidumbre", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID119", "idea": "visibilizacion de mi cuidado", "cluster": "Validación Emocional", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID120", "idea": "que no le importe el que diran", "cluster": "Validación Emocional", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID121", "idea": "el adulto mayor autoriza y exige periodos de desconexión del cuidador", "cluster": "Descanso y Bienestar del Cuidador", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID122", "idea": "Plataforma donde el puntaje de salud del adulto mayor sea interdependiente del puntaje de descanso del cuidador", "cluster": "Descanso y Bienestar del Cuidador", "mitiga": "No", "comentario": "Un cuidador agotado es un riesgo de seguridad", "marca": ""}, {"id": "ID123", "idea": "Base de datos o reporte de histories reales de cuidadores que lograron equilibrarse", "cluster": "Educación y Entrenamiento para Cuidar Mejor", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID124", "idea": "como disminuyo el tiempo reloj desde que pasa el evento de peligro", "cluster": "Reducción de Incertidumbre", "mitiga": "Si", "comentario": "Sistema que busca reducir el tiempo que la persona mayor se queda sola posterior al evento.", "marca": ""}, {"id": "ID125", "idea": "Holograma del cuidador", "cluster": "Delegación y Reemplazo", "mitiga": "Si", "comentario": "Como en Star Wars, cuando no pueda estar presente, el holograma da tranquilidad and apoyo al adulto mayor.", "marca": ""}, {"id": "ID126", "idea": "Talleres de autonomía para personas mayores", "cluster": "Autonomía de la Persona Mayor", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID127", "idea": "Acompañante ficticio", "cluster": "Delegación y Reemplazo", "mitiga": "Si", "comentario": "Acompañante que da tranquilidad and apoyo al adulto mayor cuando el cuidador no está.", "marca": ""}, {"id": "ID128", "idea": "Espacios de estadía temporal de la persona mayor", "cluster": "Delegación y Reemplazo", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID129", "idea": "Entregar possibilities de emprender / autorrealización del cuidador", "cluster": "Descanso y Bienestar del Cuidador", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID130", "idea": "Red de Intercambio entre cuidadores", "cluster": "Coordinación y Red de Apoyo", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID131", "idea": "Plataforma de seguimiento de signos vitales", "cluster": "Monitoreo and Seguridad", "mitiga": "Si", "comentario": "Sistema de alerts que identifica cambios de comportamiento.", "marca": ""}, {"id": "ID132", "idea": "registro quita ansiedad (todo estuvo bien)", "cluster": "Reducción de Incertidumbre", "mitiga": "Si", "comentario": "Sistema que monitorea el día a día de la persona cuidada, detectando ocurrencias.", "marca": "x"}, {"id": "ID133", "idea": "servicio de reemplazo confiable", "cluster": "Delegación y Reemplazo", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID134", "idea": "desconexion guiada", "cluster": "Educación y Entrenamiento para Cuidar Mejor", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID135", "idea": "red de voluntarios que apoyen al cuidador como al cuidado", "cluster": "Coordinación y Red de Apoyo", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID136", "idea": "Capsula de desonexión", "cluster": "Descanso y Bienestar del Cuidador", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID137", "idea": "recordatorio de casa segura", "cluster": "Reducción de Incertidumbre", "mitiga": "No", "comentario": "Cualidad", "marca": ""}, {"id": "ID138", "idea": "tecnologia que simplifique no que complique más", "cluster": "Otros", "mitiga": "No", "comentario": "Cualidad", "marca": ""}, {"id": "ID139", "idea": "IA tipo Alexa que funcione en el TV que interactue con el cuidador y cuidado", "cluster": "Reducción de Incertidumbre", "mitiga": "No", "comentario": "Cualidad", "marca": ""}, {"id": "ID140", "idea": "Evaluación de nivel de estres del cuidador", "cluster": "Salud Mental y Regulación Emocional", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID141", "idea": "Evaluar constantemente nivel de seguridad del hogar", "cluster": "Reducción de Incertidumbre", "mitiga": "Si", "comentario": "Sistema que registra momentos de no riesgo.", "marca": ""}, {"id": "ID142", "idea": "Programa de mentoría para la carrera o hobbies del cuidador (mientras alguien externo cuida)", "cluster": "Educación y Entrenamiento para Cuidar Mejor", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID143", "idea": "Custodia de la Responsabilidad: el sistema asume la vigilancia al salir y entrega reporte de Cero incidentes al volver", "cluster": "Validación Emocional", "mitiga": "Si", "comentario": "Ritual de cierre que absuelve al cuidador de responsabilidad retroactiva", "marca": ""}, {"id": "ID144", "idea": "informacion que se comparte al tercero (no hay olvidos ni cosas que se repiten)", "cluster": "Coordinación y Red de Apoyo", "mitiga": "No", "comentario": "Cualidad", "marca": ""}, {"id": "ID145", "idea": "soporte flexible", "cluster": "Coordinación y Red de Apoyo", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID146", "idea": "programa de mentoría para cuidadores informales", "cluster": "Educación y Entrenamiento para Cuidar Mejor", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID147", "idea": "acompañante del tiempo solo. la persona mayor tampoco se siente sola", "cluster": "Autonomía de la Persona Mayor", "mitiga": "Si", "comentario": "Acompañante que da tranquilidad and apoyo al adulto mayor.", "marca": ""}, {"id": "ID148", "idea": "Evaluación de autonomia real", "cluster": "Reducción de Incertidumbre", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID149", "idea": "Ejercicios de regulación emocional para los momentos de estres", "cluster": "Salud Mental y Regulación Emocional", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID150", "idea": "Guía o app para el manejo de ansiedad", "cluster": "Salud Mental y Regulación Emocional", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID151", "idea": "Robot para compañia y cuidado", "cluster": "Delegación y Reemplazo", "mitiga": "Si", "comentario": "Robot que da compañía and apoyo al adulto mayor.", "marca": ""}, {"id": "ID152", "idea": "sistema de intercambio, tipo comunidad", "cluster": "Coordinación y Red de Apoyo", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID153", "idea": "Control parental hogar", "cluster": "Monitoreo and Seguridad", "mitiga": "Si", "comentario": "Sistema de monitoreo and control del hogar.", "marca": ""}, {"id": "ID154", "idea": "Asistente IA de decisiones simples para el adulto mayor", "cluster": "Autonomía de la Persona Mayor", "mitiga": "No", "comentario": "Cualidad", "marca": ""}, {"id": "ID155", "idea": "servicio de un todo ok con la casa segura con recommendations que disminuyen el riesgo", "cluster": "Reducción de Incertidumbre", "mitiga": "Si", "comentario": "Oferta de tipo servicio de seguridad", "marca": ""}, {"id": "ID156", "idea": "Apoyo en el quehacer de un hogar para el cuidado", "cluster": "Coordinación y Red de Apoyo", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID157", "idea": "Sistema de validación de no riesgos del cuidado (Advertir para mejorar)", "cluster": "Reducción de Incertidumbre", "mitiga": "Si", "comentario": "Valida actions para empoderar al cuidador → transformar observations subjetivas en datos accionables.", "marca": "x"}, {"id": "ID158", "idea": "sigue estando cuidado aunque tu no estes", "cluster": "Delegación y Reemplazo", "mitiga": "No", "comentario": "Cualidad", "marca": ""}, {"id": "ID159", "idea": "Sensores de presion bajo la alfombras que detecten caidas", "cluster": "Monitoreo and Seguridad", "mitiga": "No", "comentario": "Cualidad", "marca": ""}, {"id": "ID160", "idea": "un algo que se toca que se ve", "cluster": "Otros", "mitiga": "No", "comentario": "Cualidad", "marca": ""}, {"id": "ID161", "idea": "automatización del cuidado", "cluster": "Delegación y Reemplazo", "mitiga": "No", "comentario": "Cualidad", "marca": ""}, {"id": "ID162", "idea": "dispositivo en los zapatos con gps para uso de la persona mayor", "cluster": "Monitoreo and Seguridad", "mitiga": "No", "comentario": "Sistema de trackeo", "marca": ""}, {"id": "ID163", "idea": "robot que ayude en la labor de cuidado", "cluster": "Delegación y Reemplazo", "mitiga": "Si", "comentario": "Robot de apoyo al cuidado.", "marca": ""}, {"id": "ID164", "idea": "Simulación controlada: cuando delegas se simula que todo este bien", "cluster": "Validación Emocional", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID165", "idea": "Adaptación de los entornos para dar autonomia al adulto mayor", "cluster": "Reducción de Incertidumbre", "mitiga": "No", "comentario": "Cualidad", "marca": ""}, {"id": "ID166", "idea": "Manual and/or capacitación para señales de alertas", "cluster": "Educación y Entrenamiento para Cuidar Mejor", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID167", "idea": "Servicios de mascotas entrenadas para ayuda", "cluster": "Delegación y Reemplazo", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID168", "idea": "Yo tomo la decisión difícil por ti: comité de pares valida decisiones difíciles de forma anónima", "cluster": "Validación Emocional", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID169", "idea": "Cuenta de ahorros que bloquea beneficios si el cuidador no registra actividades fuera del hogar", "cluster": "Descanso y Bienestar del Cuidador", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID170", "idea": "App que propone panoramas compatibles con su reality", "cluster": "Descanso y Bienestar del Cuidador", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID171", "idea": "Plan de metas de autonomía mensual", "cluster": "Descanso y Bienestar del Cuidador", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID172", "idea": "Sensores de desregulación en el hogar", "cluster": "Monitoreo and Seguridad", "mitiga": "Si", "comentario": "Sistema que visualiza riesgos reales y los compara con percepción del cuidador.", "marca": ""}, {"id": "ID173", "idea": "Hogares inteligentes para la gestión del cuidador", "cluster": "Monitoreo and Seguridad", "mitiga": "Si", "comentario": "Sistema que visualiza riesgos reales y los compara con percepción del cuidador.", "marca": "x"}, {"id": "ID174", "idea": "facil de usar como un mac intuitivo. no hay tiempo de aprender a usarlo", "cluster": "Otros", "mitiga": "No", "comentario": "Cualidad", "marca": ""}, {"id": "ID175", "idea": "cuidado compartido", "cluster": "Delegación y Reemplazo", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID176", "idea": "Espejo inteligente que supervise al adulto mayor en el baño y pasillo", "cluster": "Monitoreo and Seguridad", "mitiga": "No", "comentario": "Cualidad", "marca": ""}, {"id": "ID177", "idea": "red de cuidadores", "cluster": "Coordinación y Red de Apoyo", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID178", "idea": "soporte o boton de apoyo para el cuidador", "cluster": "Monitoreo and Seguridad", "mitiga": "No", "comentario": "Cualidad", "marca": ""}, {"id": "ID179", "idea": "espacios de cowork que además cuiden a la persona mayor", "cluster": "Descanso y Bienestar del Cuidador", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID180", "idea": "gran hermano del cuidador", "cluster": "Validación Emocional", "mitiga": "Si", "comentario": "Evidencia en tiempo real de cara a terceros involucrados con la persona mayor.", "marca": ""}, {"id": "ID181", "idea": "Confirmación constante que demuestre que no es necesaria la presencia del cuidador", "cluster": "Reducción de Incertidumbre", "mitiga": "Si", "comentario": "Sistema que detecta momentos de felicidad y buenos cuidados. Entrega fundamento al cuidador.", "marca": "x"}, {"id": "ID182", "idea": "Sensor de caídas con alerta al celular", "cluster": "Monitoreo and Seguridad", "mitiga": "Si", "comentario": "Permite reaccionar en el menor tiempo posible.", "marca": ""}, {"id": "ID183", "idea": "Dashboard familiar con estado diario del adulto mayor y desviaciones de rutinas", "cluster": "Monitoreo and Seguridad", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID184", "idea": "IA entrenada con la voz y estilo del cuidador (Deepfake ético and consentido)", "cluster": "Delegación y Reemplazo", "mitiga": "Si", "comentario": "Mantiene la dinámica familiar cuando el cuidador sale.", "marca": ""}, {"id": "ID185", "idea": "Plataforma que asigna automáticamente voluntario verificado para forzar al cuidador a salir por 1 hora", "cluster": "Delegación y Reemplazo", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID186", "idea": "App con alternatives de trabajo para monetizar horas libres disponibles", "cluster": "Descanso y Bienestar del Cuidador", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID187", "idea": "Sensores de desregulación de la persona cuidada", "cluster": "Monitoreo and Seguridad", "mitiga": "Si", "comentario": "Sistema de alerts que identifica cambios de comportamiento.", "marca": "x"}, {"id": "ID188", "idea": "Establecer escalas de monitoreo por gravedad del contacto", "cluster": "Educación y Entrenamiento para Cuidar Mejor", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID189", "idea": "App que divide tareas según disponibilidad real", "cluster": "Coordinación y Red de Apoyo", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID190", "idea": "si me quita tiempo no me sirve", "cluster": "Otros", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID191", "idea": "te va a permitir darte mas tiempo de no estar presente", "cluster": "Delegación y Reemplazo", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID192", "idea": "Tokens que cuantifiquen las tareas familiares", "cluster": "Coordinación y Red de Apoyo", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID193", "idea": "simular grupos de apoyo entre cuidadores", "cluster": "Coordinación y Red de Apoyo", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID194", "idea": "chatbots emocional", "cluster": "Salud Mental y Regulación Emocional", "mitiga": "No", "comentario": "Cualidad", "marca": ""}, {"id": "ID195", "idea": "lugares de esparcimiento como cafeteria para cuidadores que cuiden a personas mayores", "cluster": "Descanso y Bienestar del Cuidador", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID196", "idea": "Evidencia que otros pueden cuidar igual de bien", "cluster": "Validación Emocional", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID197", "idea": "El cuidado funciona sin tu presence", "cluster": "Delegación y Reemplazo", "mitiga": "Si", "comentario": "Sistema que demuestra que se puede cuidar sin estar presente.", "marca": "x"}, {"id": "ID198", "idea": "Reloj inteligente con GPS and boton de SOS", "cluster": "Monitoreo and Seguridad", "mitiga": "Si", "comentario": "Dispositivo de monitoreo and emergencia", "marca": ""}, {"id": "ID199", "idea": "Servicio de adaptacion y remodelación de hogar seguro", "cluster": "Reducción de Incertidumbre", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID200", "idea": "Patrones de momentos buenos que permiten reaprender", "cluster": "Educación y Entrenamiento para Cuidar Mejor", "mitiga": "Si", "comentario": "Valida actions para empoderar al cuidador → transformar observaciones subjetivas en datos accionables.", "marca": ""}, {"id": "ID201", "idea": "Cabinas de Realidad Virtual en centros comunitarios para teletransportar al cuidador en sesiones de 15 min", "cluster": "Descanso y Bienestar del Cuidador", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID202", "idea": "Dispositivos wearables vinculados: el cuidador siente el ritmo cardíaco stable de la persona mayor en su muñeca", "cluster": "Reducción de Incertidumbre", "mitiga": "Si", "comentario": "Sistema de alertas somáticas que identifica cambios de comportamiento.", "marca": ""}, {"id": "ID203", "idea": "Simulador de escenarios futuros del cuidado", "cluster": "Reducción de Incertidumbre", "mitiga": "Si", "comentario": "El cuidador es una persona ansiosa que busca anticiparse ante los riesgos", "marca": ""}, {"id": "ID204", "idea": "Reporte semanal enviado a toda la familia", "cluster": "Monitoreo and Seguridad", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID205", "idea": "me ayuda a tener todo bajo control no hay incertidumbre", "cluster": "Reducción de Incertidumbre", "mitiga": "No", "comentario": "Cualidad", "marca": ""}, {"id": "ID206", "idea": "todo en uno", "cluster": "Reducción de Incertidumbre", "mitiga": "No", "comentario": "Cualidad", "marca": ""}, {"id": "ID207", "idea": "Calculadora de sacrificio del cuidador informal", "cluster": "Validación Emocional", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID208", "idea": "escuela del cuidador informal", "cluster": "Educación y Entrenamiento para Cuidar Mejor", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID209", "idea": "marketplace de cuidado domiciliario para el adulto mayor", "cluster": "Delegación y Reemplazo", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID210", "idea": "membresia para cuidadores informales con benefits especiales", "cluster": "Descanso y Bienestar del Cuidador", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID211", "idea": "Red de apoyo que se activa sin la intervencion del cuidador", "cluster": "Coordinación y Red de Apoyo", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID212", "idea": "Evidenciar que descansar no afecta el bienestar del adulto mayor", "cluster": "Descanso y Bienestar del Cuidador", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID213", "idea": "Plataforma para responder consultations sobre el cuidado responsible", "cluster": "Reducción de Incertidumbre", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID214", "idea": "IA que detecta cambios de rutina y alerta riesgos", "cluster": "Monitoreo and Seguridad", "mitiga": "Si", "comentario": "Sistema que registra momentos de no riesgo → todo está OK.", "marca": "x"}, {"id": "ID215", "idea": "se te olvida llevarlo o prenderlo no importa registra igual avisa igual alerta igual", "cluster": "Monitoreo and Seguridad", "mitiga": "No", "comentario": "Cualidad", "marca": ""}, {"id": "ID216", "idea": "Sistema que detecta cuándo ya no conviene cuidar solo en casa", "cluster": "Monitoreo and Seguridad", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID217", "idea": "Gemelo digital del hogar para detectar riesgos futuros", "cluster": "Reducción de Incertidumbre", "mitiga": "Si", "comentario": "Sistema que visualiza riesgos reales y los compara con percepción del cuidador.", "marca": ""}, {"id": "ID218", "idea": "lector de ambiente total", "cluster": "Monitoreo and Seguridad", "mitiga": "Si", "comentario": "Sistema que visualiza riesgos reales y los compara con percepción del cuidador.", "marca": ""}, {"id": "ID219", "idea": "dispositivo intracuerpo", "cluster": "Monitoreo and Seguridad", "mitiga": "Si", "comentario": "Sistema de alertas que identifica cambios de comportamiento.", "marca": ""}, {"id": "ID220", "idea": "reducción del aislamiento del cuidador", "cluster": "Descanso y Bienestar del Cuidador", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID221", "idea": "auditoria externa del cuidado", "cluster": "Validación Emocional", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID222", "idea": "Confirmación de que el riesgo esta controlado", "cluster": "Reducción de Incertidumbre", "mitiga": "Si", "comentario": "Sistema que visualiza riesgos reales.", "marca": ""}, {"id": "ID223", "idea": "Registro de momentos en los que no fue necesario intervenir", "cluster": "Reducción de Incertidumbre", "mitiga": "Si", "comentario": "Sistema que registra momentos de no riesgo → todo está OK.", "marca": "x"}, {"id": "ID224", "idea": "Cafe mensuales con otros cuidadores para compartir sus experiences", "cluster": "Salud Mental y Regulación Emocional", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID225", "idea": "Plataforma predictiva de crisis médicas", "cluster": "Monitoreo and Seguridad", "mitiga": "Si", "comentario": "Sistema de alertas que identifica cambios de comportamiento.", "marca": ""}, {"id": "ID226", "idea": "conectados cuando necesito (lo que no pasa con el celular)", "cluster": "Coordinación y Red de Apoyo", "mitiga": "No", "comentario": "Cualidad", "marca": ""}, {"id": "ID227", "idea": "recompensa del cuidador", "cluster": "Descanso y Bienestar del Cuidador", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID228", "idea": "test semanal que evalúe la carga emocional del cuidador", "cluster": "Salud Mental y Regulación Emocional", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID229", "idea": "Señales de estabilidad emocional del adulto mayor", "cluster": "Validación Emocional", "mitiga": "Si", "comentario": "Sistema de alertas que identifica cambios de comportamiento.", "marca": ""}, {"id": "ID230", "idea": "Rutina del cuidador estandarizada", "cluster": "Educación y Entrenamiento para Cuidar Mejor", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID231", "idea": "Plataforma de busqueda de cuidadores verificados", "cluster": "Delegación y Reemplazo", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID232", "idea": "App con IA y análisis de voz para detectar deterioro cognitivo", "cluster": "Monitoreo and Seguridad", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID233", "idea": "Audio-guías de autocompasión", "cluster": "Salud Mental y Regulación Emocional", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID234", "idea": "Talleres de respiración y manejo del estrés", "cluster": "Salud Mental y Regulación Emocional", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID235", "idea": "beneficios para cuidadores", "cluster": "Descanso y Bienestar del Cuidador", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID236", "idea": "dia libre para el cuidador financiado por el Estado", "cluster": "Descanso y Bienestar del Cuidador", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID237", "idea": "Sistema que compare percepción de riesgo vs riesgo real del cuidador", "cluster": "Reducción de Incertidumbre", "mitiga": "Si", "comentario": "Sistema que visualiza los riesgos reales existentes y los compara con percepción del cuidador.", "marca": "x"}, {"id": "ID238", "idea": "Protocolo de intervención", "cluster": "Reducción de Incertidumbre", "mitiga": "Si", "comentario": "Sistema que permite saber cómo actuar ante una situación específica.", "marca": ""}, {"id": "ID239", "idea": "Red vecinal paga de apoyo temporal", "cluster": "Coordinación y Red de Apoyo", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID240", "idea": "Test de dependencia emocional del rol de cuidador", "cluster": "Salud Mental y Regulación Emocional", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID241", "idea": "App que mude cuánto tiempo real se dedica al cuidado", "cluster": "Descanso y Bienestar del Cuidador", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID242", "idea": "apps que obligue a programar descansos semanales para el cuidador", "cluster": "Descanso y Bienestar del Cuidador", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID243", "idea": "plataforma digital integral dedicada al cuidador", "cluster": "Salud Mental y Regulación Emocional", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID244", "idea": "Evaluación periodica del estado real vs estado percibido del adulto mayor", "cluster": "Reducción de Incertidumbre", "mitiga": "No", "comentario": "Test/evaluación que mide objetivamente el nivel de dependencia.", "marca": ""}, {"id": "ID245", "idea": "Validación de que el adulto mayor puede estar solo en ciertos contextos", "cluster": "Reducción de Incertidumbre", "mitiga": "Si", "comentario": "Sistema que registra momentos de no riesgo → todo está OK.", "marca": "x"}, {"id": "ID246", "idea": "Gestor de trámites del cuidado", "cluster": "Coordinación y Red de Apoyo", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID247", "idea": "Detector de inactividad prolongada", "cluster": "Monitoreo and Seguridad", "mitiga": "Si", "comentario": "Sistema de alertas que identifica cambios de comportamiento.", "marca": ""}, {"id": "ID248", "idea": "Sistema que reduce la percepción de urgencia en situaciones no criticas", "cluster": "Educación y Entrenamiento para Cuidar Mejor", "mitiga": "Si", "comentario": "Sistema que reconoce y categoriza situaciones según gravedad y urgencia.", "marca": ""}, {"id": "ID249", "idea": "Club de hobbies para cuidadores", "cluster": "Descanso y Bienestar del Cuidador", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID250", "idea": "Escáner de estrés por voz", "cluster": "Salud Mental y Regulación Emocional", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID251", "idea": "Supervisión externa nocturna para que el cuidador duerma", "cluster": "Monitoreo and Seguridad", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID252", "idea": "Bastón con GPS y alertas", "cluster": "Monitoreo and Seguridad", "mitiga": "No", "comentario": "", "marca": ""}, {"id": "ID253", "idea": "Detector de ruido anormal en el hogar", "cluster": "Monitoreo and Seguridad", "mitiga": "No", "comentario": "Cualidad", "marca": ""}, {"id": "ID254", "idea": "Certificación básica para familiares que ayudan", "cluster": "Educación y Entrenamiento para Cuidar Mejor", "mitiga": "No", "comentario": "", "marca": ""}];
+
+    const CLUSTERS = [
+      "Monitoreo y Seguridad",
+      "Coordinación y Red de Apoyo",
+      "Salud Mental y Regulación Emocional",
+      "Descanso y Bienestar del Cuidador",
+      "Validación Emocional",
+      "Reducción de Incertidumbre",
+      "Delegación y Reemplazo",
+      "Educación y Entrenamiento para Cuidar Mejor",
+      "Autonomía de la Persona Mayor",
+      "Otros"
+    ];
+
+    const CLUSTER_COLORS = {
+      "Monitoreo y Seguridad": "#38bdf8", // Sky
+      "Coordinación y Red de Apoyo": "#34d399", // Emerald
+      "Salud Mental y Regulación Emocional": "#c084fc", // Purple
+      "Descanso y Bienestar del Cuidador": "#f87171", // Red
+      "Validación Emocional": "#fbbf24", // Amber
+      "Reducción de Incertidumbre": "#2dd4bf", // Teal
+      "Delegación y Reemplazo": "#f472b6", // Pink
+      "Educación y Entrenamiento para Cuidar Mejor": "#a7f3d0", // Light Green
+      "Autonomía de la Persona Mayor": "#60a5fa", // Blue
+      "Otros": "#94a3b8" // Slate
+    };
+
+    const FRONTIER_IDS = ["ID184","ID143","ID75"];
+    const FRONTIER_INFO = {
+      "ID184": {
+        name: "El clon emocional",
+        concept: "IA entrenada con la voz y estilo del cuidador",
+        description: "Una IA entrenada durante meses con la voz, los dichos, el ritmo y las rutinas afectivas del cuidador, que se activa como presencia cuando el cuidador se aleja. No es un asistente genérico: es una proyección del vínculo. La persona mayor no siente que la dejaron; el cuidador no siente que falló.",
+        whyCrazy: "Implica que la relación de cuidado puede \"transferirse\" temporalmente a una IA personalizada. Choca de frente con nociones de autenticidad, ética del vínculo y lo que significa \"estar presente\". Genera debate filosófico sobre si el consuelo falso es consuelo real.",
+        reveal: "El dolor no es la ausencia física, es la ausencia del vínculo sentido. Si eso puede sostenerse de otra forma, la culpa se desvanece.",
+        keywords: ["Holograma del cuidador", "Como en Star Wars", "Acompañante ficticio"]
+      },
+      "ID143": {
+        name: "El certificado de bienestar",
+        concept: "Custodia de la Responsabilidad",
+        description: "Un objeto físico o interfaz digital de \"Custodia de la Responsabilidad\", cuando el cuidador sale, y al regresar el cuidador, le entrega un reporte legal-emocional firmado digitalmente: \"Durante tu ausencia, tu familiar estuvo bien. Nada que pudieras haber hecho habría cambiado lo que ocurrió.\" Funciona como un \"ritual de cierre\" que absuelve al cuidador de responsabilidad retroactiva.",
+        whyCrazy: "Combina tecnología de monitoreo con psicología del ritual y algo parecido a un acto notarial emocional. Nadie ha pensado en certificar el bienestar como forma de gestionar culpa anticipada.",
+        reveal: "La culpa de Andrea no es racional, es una narrativa de \"si algo pasa, será mi culpa\". Desarticular esa narrativa con evidencia verificada podría ser más poderoso que cualquier sistema de alerta.",
+        keywords: ["Responsabilidad legal", "Custodia del cuidado"]
+      },
+      "ID75": {
+        name: "La transmisión de guardia",
+        concept: "Inmediatez ante emergencies",
+        description: "Un protocolo físico-digital de traspaso formal del cuidado: cuando el cuidador necesita alejarse, activa un ritual de \"entrega de turno\" — como en medicina o seguridad — donde el sistema (o un cuidador de red) recibe explictamente la responsabilidad. Incluye un briefing del estado de la persona mayor, alertas configuradas, y una confirmación de que alguien (humano o sistema) \"tiene el turno\". Al volver, hace el proceso inverso.",
+        whyCrazy: "Trata el cuidado informal como si fuera una operación crítica con protocolos de continuidad. Implica que la culpa tiene raíz en la ambigüedad de quién es responsable cuando el cuidador no está.",
+        reveal: "Estructurar la salida como un acto formal y deliberado — no como un escape — podría transformar la percepción moral del cuidador sobre alejarse.",
+        keywords: ["Sistema de turnos", "Relevo/posta", "Red de apoyo"]
+      }
+    };
+
+    // Consolidated concept details from images provided by the user (UPGRADED to EXACT slide transcriptions)
+    const RANKED_IDEAS_DETAILS = {
+      "Concepto #1": {
+        title: "1. Sistema de traspaso de guardia con protocolo de salida y retorno (turno seguro)",
+        details: `<strong>Concepto detallado:</strong> Una plataforma que convierte el acto de "salir" en un ritual estructurado de tres momentos: activación, ausencia y cierre.<br><br>
+        • <strong>Fase de Activación:</strong> Cuando Andrea necesita salir, activa el "Turno Seguro" desde su teléfono. El sistema ejecuta un <strong>checklist contextual automático</strong>: verifica que la cocina esté apagada, que la persona mayor esté en una zona segura, que la medicación del período esté tomada, y que haya conectividad. Le devuelve a Andrea una "pantalla de despegue" no una lista de riesgos, sino una <strong>confirmación de estado: "Todo listo. Puedes salir."</strong><br><br>
+        • <strong>Fase de Ausencia:</strong> Durante la ausencia, el sistema no bombardea con notificaciones. Solo interviene si hay una <strong>anomalía real</strong>, usando un <strong>algoritmo de severidad</strong> que distingue entre "evento menor gestionable" (luz encendida a las 3am) y "evento crítico" (inmovilidad prolongada en baño). Andrea <strong>configura previamente su umbral</strong>: quiere saber solo lo urgente, o quiere check-ins cada 30 minutos.<br><br>
+        • <strong>Fase de Retorno:</strong> Al regresar, activa el "cierre de turno": el sistema le entrega un <strong>resumen narrativo</strong> no datos crudos que describe cómo estuvo su familiar durante su ausencia. El lenguaje es deliberadamente emocional: "Tu mamá estuvo tranquila. Tomó su medicación, estuvo en el living dos horas y no hubo ningún evento. No necesitabas estar."`
+      },
+      "Concepto #2": {
+        title: "2. Sistema de bienestar conductual que transforma patrones en certeza",
+        details: `<strong>Concepto detallado:</strong> El sistema aprende durante 2-3 semanas la <strong>rutina conductual de la persona mayor</strong>: horarios de actividad, tiempo en cada espacio, patrones de sueño, uso de cocina, frecuencia de movimiento. <strong>Construye una línea base personalizada</strong>, no comparada con ningún estándar clínico, sino con la propia persona.<br><br>
+        • A partir de esa línea base, el sistema entrega dos cosas. Primero, durante las ausencias: <strong>señales de normalidad activa</strong>, no solo "no hay alertas", sino "tu mamá está siguiendo su rutina habitual, todo normal". Segundo, de forma periódica: un reporte de calidad del cuidado que <strong>muestra tendencias positivas</strong>. "Esta semana tu mamá durmió mejor que el mes pasado. Su movilidad en el living aumentó un 20%." Eso no es solo monitoreo, es evidencia de que el cuidado de Andrea está funcionando.<br><br>
+        • <strong>Índice de autonomía segura:</strong> un indicador semanal que le dice a Andrea <strong>en qué contextos su familiar puede estar solo con bajo riesgo real, diferenciando entre percepción de riesgo y riesgo medido</strong>. Esto nace de la idea del brainstorming: "sistema que compare percepción de riesgo vs. riesgo real".`
+      },
+      "Concepto #3": {
+        title: "3. Asistente de presencia activa que acompaña, guía y previene",
+        details: `<strong>Concepto detallado:</strong> Cuando Andrea no está, hay alguien que sí está, no para vigilar, sino para acompañar, orientar y actuar antes de que la situación se complique.<br><br>
+        Los sistemas de monitoreo detectan pero no acompañan. Compañero Presente integra ambas dimensiones en un solo agente. No es un robot físico costoso ni un altavoz genérico. Es un agente de presencia activa, puede ser un dispositivo con pantalla y voz, o funcionar sobre hardware existente (tablet, smart speaker), que tiene dos modos de operación según si Andrea está o no está en el hogar.<br><br>
+        • <strong>Modo \"Andrea en casa\" → aprendizaje y calibración:</strong> El agente aprende la rutina, los hábitos, las preferencias y el estado funcional de la persona mayor. Aprende cómo habla, qué le gusta, a qué hora toma sus medicamentos, cuánto tarda normalmente en el baño, si cocina sola o no. También aprende de Andrea: qué situaciones la preocupan más, cuáles son sus instrucciones de emergencia, qué nivel de intervención quiere del sistema.<br><br>
+        • <strong>Modo \"Andrea ausente\" → presencia activa:</strong> Cuando Andrea activa el \"Modo Ausencia\", el agente cambia su comportamiento. Pasa de aprendizaje pasivo a presencia activa. Inicia conversaciones cortas de check-in: \"Buenos días, ¿cómo amaneciste hoy?\" No es vigilancia, es compañía que simultáneamente recaba información de estado. Si la persona mayor menciona dolor, desorientación o no responde con coherencia habitual, el sistema lo registra como señal de alerta. El agente también guía proactivamente tareas de riesgo: \"Son las 12, es hora de tu medicación, ¿quieres que te recuerde dónde está?\" o \"Vas a cocinar, recuerda apagar la hornilla cuando termines, ¿de acuerdo?\" No es control, es la voz de Andrea presente en el hogar.<br><br>
+        • <strong>Prevención activa:</strong> Integrado con sensores básicos del hogar, el agente puede actuar sobre situaciones antes de que escalen. Si detecta inmovilidad prolongada, inicia un check-in conversacional. Si la persona mayor no responde, escala con contexto a Andrea. Si detecta cocina encendida más tiempo del usual, pregunta en voz alta. La intervención siempre es primero local, conversacional y no invasiva.<br><br>
+        • <strong>Vínculo con Andrea:</strong> El agente también actúa como puente emocional. Al final del día, o cuando Andrea regresa, le entrega un resumen en lenguaje cotidiano: \"Tu mamá estuvo de buen ánimo hoy. Me contó que extrañaba a tu papá. Tomó sus medicamentos a tiempo. Hubo un momento en la cocina que resolví conversando con ella.\" Eso no es solo datos, es narrativa que sostiene el vínculo a distancia y mitiga la culpa de no haber estado.`
+      },
+      "Concepto #4": {
+        title: "4. Compañero conversacional con memoria cognitiva activa y señal de estado para el cuidador",
+        details: `<strong>Concepto detallado:</strong> Un compañero de voz que no solo acompaña, aprende cómo es tu familiar en sus mejores días, detecta cuándo algo está cambiando, y le dice a Andrea lo que realmente necesita saber cuando no está.<br><br>
+        Ato devuelve la soledad. Resuelve algo más profundo y más conectado con el arquetipo: el miedo de Andrea a que su familiar esté deteriorándose sin que ella lo note, y la culpa de sentir que si estuviera más presente podría prevenirlo.<br><br>
+        El sistema tiene tres capas:<br>
+        • <strong>1. Memoria de bienestar cognitivo y emocional:</strong> El dispositivo aprende durante las primeras semanas cómo conversa la persona mayor en su estado habitual: su vocabulario, su coherencia narrativa, sus temas de interés, su estado emocional típico, su velocidad de respuesta, sus recuerdos frecuentes. Construye una línea base conversacional personalizada, no clínica, sino relacional. Esto no lo hace ningún producto del mercado actual.<br><br>
+        • <strong>2. Detección sutil de variaciones:</strong> A partir de esa línea base, el sistema identifica conversaciones donde algo es distinto: respuestas más cortas de lo habitual, confusión en temas que normalmente domina, estado emocional más bajo, desorientación temporal leve, repetición inusual de preguntas. No diagnostica, señaliza variaciones con contexto. Esto convierte la conversación diaria en un instrumento pasivo de seguimiento cognitivo y emocional.<br><br>
+        • <strong>3. Reporte de estado real para Andrea:</strong> No un log de actividad del dispositivo como Ato. Un reporte en lenguaje cotidiano que le dice a Andrea lo que realmente le importa: cómo estuvo su familiar hoy comparado con su estado habitual. "Tu mamá estuvo más callada de lo usual hoy. Habló poco de tus hijos, que normalmente menciona. Puede ser un día bajón, o puede valer la pena preguntarle cómo se siente." Eso no es una alarma de emergencia, es inteligencia emocional que Andrea no puede tener cuando no está.<br><br>
+        Cuando Andrea necesita ausentarse, activa el modo ausencia. El dispositivo intensifica su presencia, inicia más conversaciones, propone actividades breves, recuerda rutinas. Al volver, Andrea recibe un resumen de cómo estuvo su familiar durante ese período específico. No \"el dispositivo fue usado 3 veces\", sino \"tu mamá estuvo animada, habló de su juventud, tomó sus medicamentos cuando se lo recordé. Estuvo bien.\"`
+      }
+    };
+
+    // Mapping concepts from overlay to their respective source elements and core D3 hubs
+    const CONCEPT_MAPS = {
+      "Concepto #2": {
+        name: "Bienestar Conductual (Normalidad Activa)",
+        ids: ["ID102", "ID132", "ID157", "ID181", "ID223", "ID237", "ID11", "ID62", "ID85", "ID90", "ID96", "ID200"],
+        hubId: "hub2"
+      },
+      "Concepto #3": {
+        name: "Asistencia Conversacional (Voz Compartida)",
+        ids: ["ID184", "ID125", "ID127", "ID151", "ID147", "ID139", "ID154"],
+        hubId: "hub3"
+      },
+      "Concepto #4": {
+        name: "Estructura Familiar (Dashboard Cooperativo)",
+        ids: ["ID12", "ID53", "ID59", "ID189", "ID192", "ID30", "ID66", "ID75", "ID80", "ID211", "ID246"],
+        hubId: "hub1"
+      }
+    };
+
+    // Pedagogical details for View 5 Hubs
+    const HUBS_PEDAGOGY = {
+      "hub1": {
+        name: "🛡️ Traspaso de Guardia",
+        meaning: "Este pilar aborda la responsabilidad del relevo. Ayuda al cuidador a traspasar la 'custodia' moral de la persona mayor al sistema o a un tercero sin experimentar culpabilidad retroactiva.",
+        tension: "Cruza la necesidad realista de un [ID9] 'Modo Centinela' con el protocolo extremo de [ID75] 'La Transmisión de Guardia' estructurado como operación de seguridad.",
+        result: "Cristaliza directamente en la propuesta ganadora (Concepto #1): 'Sistema de Traspaso de Guardia con Protocolo de Salida y Retorno (Turno Seguro)'."
+      },
+      "hub2": {
+        name: "📈 Bienestar Conductual",
+        meaning: "Este pilar traduce el monitoreo pasivo en paz mental. En lugar de alertar constantemente, enseña al sistema a validar que 'la normalidad del hogar sigue existiendo'.",
+        tension: "Combina la idea de validar el buen cuidado [ID102] con la provocación ética de [ID143] 'El Certificado de Bienestar' que absuelve al cuidador.",
+        result: "Conduce de manera directa al Concepto #2: 'Sistema de Bienestar Conductual que Transforma Patrones en Certeza'."
+      },
+      "hub3": {
+        name: "🗣️ Asistencia Conversacional",
+        meaning: "Este pilar representa el acompañamiento relacional interactivo. Busca que el adulto mayor mantenga un estímulo constante e independiente durante la ausencia del cuidador.",
+        tension: "Sostiene el diálogo mediante la provocación radical del [ID184] 'El Clon Emocional' combinada con el [ID127] 'Acompañante Ficticio'.",
+        result: "Se divide en el Concepto #3 (Asistente de Presencia Activa) y el Concepto #4 (Compañero Conversacional con Memoria Cognitiva)."
+      }
+    };
+
+    const WINNER_ID = "ID9";
+    const SEED_IDS = DATA.filter(d => d.marca === "x").map(d => d.id);
+    const MITIGATES = DATA.filter(d => d.mitiga === "Si").map(d => d.id);
+
+    // Dynamic state
+    let activeClusterFilter = null;
+    let activeConceptHighlight = null; // Concept code to filter & zoom on View 5
+    let currentView = "1";
+    let selectedNode = null;
+
+    // Dynamic Auto-Tour State Management
+    let tourActive = false;
+    let tourStep = 0;
+    let tourInterval = null;
+    const TOUR_STEP_DURATION = 9000; // milliseconds per station
+
+    const TOUR_STEPS = [
+      {
+        view: "1",
+        title: "① Exploración del Universo Completo",
+        desc: "Arrancamos el proceso metodológico mapeando la totalidad de la divergencia: 254 ideas sueltas estructuradas de forma natural en 10 territorios.",
+        metrics: { novelty: 3, fact: 3.5, viab: 3.5, deseo: 4, impact: 3 },
+        focusNode: null
+      },
+      {
+        view: "2",
+        title: "② Filtrado: Mitigación de Culpa",
+        desc: "Filtramos quirúrgicamente el cosmos para iluminar únicamente las 84 ideas de tu excel destinadas específicamente a disolver la culpabilidad anticipada de Andrea.",
+        metrics: { novelty: 4, fact: 3, viab: 3, deseo: 4.5, impact: 4.2 },
+        focusNode: null
+      },
+      {
+        view: "3",
+        title: "③ El Anclaje: 17 Ideas Semilla",
+        desc: "Viajamos cinemáticamente hacia las 17 ideas semilla. Nodos realistas y de altísima recurrencia técnica como la idea de 'Traspaso Formal de Guardia' [ID9].",
+        metrics: { novelty: 3, fact: 5, viab: 4.5, deseo: 4, impact: 4 },
+        focusNode: "ID9"
+      },
+      {
+        view: "4",
+        title: "④ La Provocación: 3 Ideas Frontera",
+        desc: "Hacemos foco en el extremo opuesto del espectro: 3 ideas locas y utópicas. El 'Clon Emocional' [ID184] nos revela que el vínculo sentido mitiga la culpa.",
+        metrics: { novelty: 5, fact: 1.5, viab: 2, deseo: 5, impact: 4.5 },
+        focusNode: "ID184"
+      },
+      {
+        view: "5",
+        title: "⑤ Convergencia en 3 Pilares Centrales",
+        desc: "Las ideas reales (Semillas) y locas (Fronteras) colisionan. La tensión resultante se traduce en 3 pilares de traducción en pantalla.",
+        metrics: { novelty: 4.5, fact: 4, viab: 4, deseo: 5, impact: 5 },
+        focusNode: "hub1"
+      },
+      {
+        view: "6",
+        title: "⑥ Consolidación: Propuesta Ganadora",
+        desc: "¡La cristalización final! Nace la propuesta unificada: 'Sistema de traspaso de guardia con protocolo de salida y retorno (turno seguro)', una fusión perfecta.",
+        metrics: { novelty: 4.8, fact: 4.5, viab: 4.5, deseo: 5, impact: 5 },
+        focusNode: "ID9"
+      }
+    ];
+
+    // D3 Simulation variables
+    let svg, mainG, simulation, nodeSelection;
+    let zoomBehavior;
+
+    // ============================================================
+    // CANVAS SPACE BACKGROUND (Dynamic Twinkle Starfield)
+    // ============================================================
+    function initStarfield() {
+      const canvas = document.getElementById("stars-canvas");
+      const ctx = canvas.getContext("2d");
+      let width = (canvas.width = window.innerWidth);
+      let height = (canvas.height = window.innerHeight);
+
+      const stars = [];
+      const numStars = 150;
+
+      for (let i = 0; i < numStars; i++) {
+        stars.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          size: Math.random() * 1.5 + 0.2,
+          alpha: Math.random(),
+          speed: Math.random() * 0.02 + 0.005,
+          twinkle: Math.random() > 0.5
+        });
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, width, height);
+        ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+        
+        stars.forEach(star => {
+          if (star.twinkle) {
+            star.alpha += star.speed;
+            if (star.alpha > 1 || star.alpha < 0.2) star.speed = -star.speed;
+          }
+          ctx.shadowBlur = star.size * 4;
+          ctx.shadowColor = "rgba(255, 255, 255, 0.3)";
+          ctx.fillStyle = `rgba(255, 255, 255, ${Math.max(0.1, Math.min(1, star.alpha))})`;
+          ctx.beginPath();
+          ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        requestAnimationFrame(draw);
+      }
+
+      window.addEventListener("resize", () => {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+      });
+
+      draw();
+    }
+
+    // ============================================================
+    // UTILITY: SHOW TOAST ERROR OR MESSAGE
+    // ============================================================
+    function showToast(message, duration = 4000) {
+      const toast = document.getElementById("toast");
+      const text = document.getElementById("toast-message");
+      text.textContent = message;
+      toast.classList.remove("hidden");
+      toast.classList.add("flex");
+      
+      setTimeout(() => {
+        toast.classList.add("hidden");
+        toast.classList.remove("flex");
+      }, duration);
+    }
+
+    // ============================================================
+    // FILTER MANAGEMENT
+    // ============================================================
+    function renderTerritoryFilters() {
+      const list = document.getElementById("territory-list");
+      list.innerHTML = "";
+
+      CLUSTERS.forEach(cluster => {
+        const count = DATA.filter(d => d.cluster === cluster).length;
+        const color = CLUSTER_COLORS[cluster];
+        const isActive = activeClusterFilter === cluster;
+
+        const btn = document.createElement("button");
+        btn.className = `w-full text-left px-3 py-2 rounded-xl border transition-all duration-300 flex items-center justify-between text-xs font-medium group ${
+          isActive 
+            ? "bg-slate-800/80 text-white border-blue-500/50 shadow-md shadow-blue-500/5" 
+            : "bg-slate-900/30 text-slate-300 border-white/5 hover:border-white/10 hover:bg-slate-900/50"
+        }`;
+        
+        btn.innerHTML = `
+          <div class="flex items-center gap-2 truncate">
+            <span class="w-2.5 h-2.5 rounded-full shrink-0 group-hover:scale-110 transition-transform" style="background-color: ${color}; box-shadow: 0 0 6px ${color}60"></span>
+            <span class="truncate pr-1">${cluster}</span>
+          </div>
+          <span class="text-[10px] px-1.5 py-0.5 rounded-full ${isActive ? 'bg-blue-500/20 text-blue-300' : 'bg-slate-800 text-slate-400'}">${count}</span>
+        `;
+
+        btn.addEventListener("click", () => {
+          activeClusterFilter = isActive ? null : cluster;
+          renderTerritoryFilters();
+          applyActiveFilters();
+          document.getElementById("clear-filters-btn").classList.toggle("hidden", !activeClusterFilter);
+        });
+
+        list.appendChild(btn);
+      });
+    }
+
+    document.getElementById("clear-filters-btn").addEventListener("click", () => {
+      activeClusterFilter = null;
+      renderTerritoryFilters();
+      applyActiveFilters();
+      document.getElementById("clear-filters-btn").classList.add("hidden");
+    });
+
+    // ============================================================
+    // D3 GRAPH RENDERING ENGINE
+    // ============================================================
+    function calculateClusterCenter(cluster, w, h) {
+      const cx = w / 2;
+      const cy = h / 2;
+      const radius = Math.min(w, h) * 0.3;
+      const index = CLUSTERS.indexOf(cluster);
+      const angle = (index / CLUSTERS.length) * 2 * Math.PI - Math.PI / 2;
+      return {
+        x: cx + radius * Math.cos(angle),
+        y: cy + radius * Math.sin(angle)
+      };
+    }
+
+    function showRightPanel() {
+      const panel = document.getElementById("right-panel");
+      panel.classList.remove("w-0", "border-l-0", "opacity-0");
+      panel.classList.add("w-96", "border-l", "border-white/5", "opacity-100");
+    }
+
+    function hideRightPanel() {
+      const panel = document.getElementById("right-panel");
+      panel.classList.remove("w-96", "border-l", "border-white/5", "opacity-100");
+      panel.classList.add("w-0", "border-l-0", "opacity-0");
+    }
+
+    function initD3Simulation() {
+      const container = document.getElementById("canvas-container");
+      const width = container.clientWidth;
+      const height = container.clientHeight;
+
+      container.innerHTML = ""; // reset container
+
+      // Core SVG Elements
+      const outerSvg = d3.select("#canvas-container")
+        .append("svg")
+        .attr("width", "100%")
+        .attr("height", "100%")
+        .attr("viewBox", `0 0 ${width} ${height}`);
+
+      // Setup Zoom Behavior
+      zoomBehavior = d3.zoom()
+        .scaleExtent([0.3, 8])
+        .on("zoom", (event) => {
+          mainG.attr("transform", event.transform);
+        });
+
+      outerSvg.call(zoomBehavior);
+      mainG = outerSvg.append("g");
+
+      // Glowing filter definitions
+      const defs = outerSvg.append("defs");
+      
+      const glowFilter = defs.append("filter")
+        .attr("id", "blue-glow")
+        .attr("x", "-50%")
+        .attr("y", "-50%")
+        .attr("width", "200%")
+        .attr("height", "200%");
+      glowFilter.append("feGaussianBlur").attr("stdDeviation", "5").attr("result", "blur");
+      glowFilter.append("feMerge").selectAll("feMergeNode")
+        .data(["blur", "SourceGraphic"])
+        .enter().append("feMergeNode").attr("in", d => d);
+
+      // Program nodes coordinates
+      const nodes = DATA.map(d => {
+        const center = calculateClusterCenter(d.cluster, width, height);
+        const isFrontier = FRONTIER_IDS.includes(d.id);
+        const isSeed = SEED_IDS.includes(d.id);
+        const isWinner = d.id === WINNER_ID;
+
+        let radius = 6;
+        if (isWinner) radius = 18;
+        else if (isFrontier) radius = 14;
+        else if (isSeed) radius = 10;
+
+        return {
+          ...d,
+          x: center.x + (Math.random() - 0.5) * 120,
+          y: center.y + (Math.random() - 0.5) * 120,
+          r: radius,
+          origR: radius
+        };
+      });
+
+      // Connections / Links group (Background rendering)
+      const linkG = mainG.append("g").attr("class", "links-layer");
+
+      // Orbit/Space Ambient Ring
+      mainG.append("circle")
+        .attr("cx", width / 2)
+        .attr("cy", height / 2)
+        .attr("r", Math.min(width, height) * 0.3)
+        .attr("fill", "none")
+        .attr("stroke", "rgba(59, 130, 246, 0.08)")
+        .attr("stroke-width", 1.5)
+        .attr("stroke-dasharray", "8 12");
+
+      // Force Layout Config
+      simulation = d3.forceSimulation(nodes)
+        .force("charge", d3.forceManyBody().strength(-20))
+        .force("center", d3.forceCenter(width / 2, height / 2).strength(0.04))
+        .force("collision", d3.forceCollide().radius(d => d.r + 4).iterations(3))
+        .force("customCluster", alpha => {
+          nodes.forEach(d => {
+            const center = calculateClusterCenter(d.cluster, width, height);
+            d.vx += (center.x - d.x) * alpha * 0.15;
+            d.vy += (center.y - d.y) * alpha * 0.15;
+          });
+        })
+        .on("tick", () => {
+          nodeSelection.attr("transform", d => `translate(${d.x}, ${d.y})`);
+        });
+
+      // Render Nodes Graphic
+      const nodeG = mainG.append("g").attr("class", "nodes-layer");
+
+      nodeSelection = nodeG.selectAll("g.node-group")
+        .data(nodes, d => d.id)
+        .enter()
+        .append("g")
+        .attr("class", "node-group")
+        .style("cursor", "pointer")
+        .on("click", (event, d) => {
+          selectNodeElement(d);
+          event.stopPropagation();
+        })
+        .on("mouseover", (event, d) => {
+          setHoverPreview(d);
+        })
+        .on("mouseout", () => {
+          clearHoverPreview();
+        })
+        .call(d3.drag()
+          .on("start", (event, d) => {
+            if (!event.active) simulation.alphaTarget(0.2).restart();
+            d.fx = d.x;
+            d.fy = d.y;
+          })
+          .on("drag", (event, d) => {
+            d.fx = event.x;
+            d.fy = event.y;
+          })
+          .on("end", (event, d) => {
+            if (!event.active) simulation.alphaTarget(0);
+            d.fx = null;
+            d.fy = null;
+          })
+        );
+
+      // Node base rendering
+      nodeSelection.each(function(d) {
+        const el = d3.select(this);
+        const color = CLUSTER_COLORS[d.cluster] || "#3b82f6";
+        const isFrontier = FRONTIER_IDS.includes(d.id);
+        const isSeed = SEED_IDS.includes(d.id);
+        const isWinner = d.id === WINNER_ID;
+
+        if (isWinner) {
+          // Special Sun Winner design
+          el.append("circle")
+            .attr("r", d.r + 6)
+            .attr("fill", "none")
+            .attr("stroke", "#ef4444")
+            .attr("stroke-width", 1.5)
+            .attr("stroke-dasharray", "4 3")
+            .attr("class", "pulse-glow");
+            
+          el.append("circle")
+            .attr("r", d.r)
+            .attr("fill", "#f43f5e")
+            .attr("filter", "url(#blue-glow)");
+        } else if (isFrontier) {
+          // Outer Orbit Orbit-ring
+          el.append("circle")
+            .attr("r", d.r + 5)
+            .attr("fill", "none")
+            .attr("stroke", "#f59e0b")
+            .attr("stroke-width", 1)
+            .attr("stroke-dasharray", "3 4");
+
+          el.append("circle")
+            .attr("r", d.r)
+            .attr("fill", "#f59e0b")
+            .attr("filter", "url(#blue-glow)");
+        } else if (isSeed) {
+          el.append("circle")
+            .attr("r", d.r + 3)
+            .attr("fill", "none")
+            .attr("stroke", "#fbbf24")
+            .attr("stroke-width", 0.8);
+
+          el.append("circle")
+            .attr("r", d.r)
+            .attr("fill", "#fbbf24");
+        } else {
+          // Standard core circle
+          el.append("circle")
+            .attr("r", d.r)
+            .attr("fill", color)
+            .attr("opacity", 0.85);
+        }
+
+        // Inside icon/symbol for special markers
+        if (isWinner || isFrontier || isSeed) {
+          el.append("text")
+            .attr("text-anchor", "middle")
+            .attr("dominant-baseline", "central")
+            .attr("fill", isWinner || isFrontier ? "#0f172a" : "#1e293b")
+            .attr("font-size", d.r * 0.9)
+            .attr("font-weight", "black")
+            .text(isWinner ? "🏆" : isFrontier ? "🔥" : "💡");
+        }
+      });
+
+      // Click outside graph clears selection and collapses side panel
+      outerSvg.on("click", () => {
+        if (currentView === "5") {
+          activeConceptHighlight = null;
+          document.getElementById("active-concept-filter-badge").classList.add("hidden");
+          resetZoomScale();
+          switchView("5");
+        }
+        clearSelection();
+      });
+
+      // Set default scale on start
+      resetZoomScale();
+    }
+
+    // Centered zoom transition to coordinates
+    function focusOnHub(x, y, scale = 1.3) {
+      if (!zoomBehavior || !mainG) return;
+      const container = document.getElementById("canvas-container");
+      const w = container.clientWidth;
+      const h = container.clientHeight;
+
+      d3.select("#canvas-container svg")
+        .transition()
+        .duration(1200)
+        .call(
+          zoomBehavior.transform,
+          d3.zoomIdentity
+            .translate(w / 2, h / 2)
+            .scale(scale)
+            .translate(-x, -y)
+        );
+    }
+
+    function resetZoomScale() {
+      if (!zoomBehavior || !mainG) return;
+      const container = document.getElementById("canvas-container");
+      const w = container.clientWidth;
+      const h = container.clientHeight;
+
+      d3.select("#canvas-container svg")
+        .transition()
+        .duration(750)
+        .call(zoomBehavior.transform, d3.zoomIdentity.translate(0, 0).scale(1));
+    }
+
+    document.getElementById("reset-zoom-btn").addEventListener("click", resetZoomScale);
+
+    // ============================================================
+    // VISUAL VIEW TRANSITIONS (The 6 Stages)
+    // ============================================================
+    const VIEW_NARRATIVES = {
+      "1": {
+        title: "① Universo Completo",
+        desc: "Mapeo completo de las 254 ideas divergentes iniciales. Usa los filtros laterales para navegar por los territorios temáticos.",
+        live: "Explora libremente haciendo zoom o usando el panel de filtros a la izquierda."
+      },
+      "2": {
+        title: "② Mitigación de la Culpa",
+        desc: "Filtrado selectivo que muestra únicamente las 84 ideas de tu excel destinadas a aliviar de forma proactiva la culpabilidad moral del cuidador.",
+        live: "84 ideas que absuelven activamente al cuidador de su carga moral."
+      },
+      "3": {
+        title: "③ Ideas Semilla",
+        desc: "Las 17 ideas semilla actúan como imanes de convergencia. Representan soluciones intuitivas recurrentes que anclan el diseño.",
+        live: "17 ideas semilla destacadas. Analiza cómo atraen las soluciones."
+      },
+      "4": {
+        title: "④ Ideas Frontera",
+        desc: "Tres conceptos extremos o técnicamente imposibles elegidos para desarmar paradojas de diseño. No son propuestas factibles en sí, sino catalizadores que revelan la verdadera solución.",
+        live: "Explora las 3 ideas frontera. Haz click en ellas para ver su revelación oculta."
+      },
+      "5": {
+        title: "⑤ Convergencia Estructurada",
+        desc: "Las ideas semilla y fronteras confluyen y se agrupan en tres preselecciones operativas de valor técnico.",
+        live: "Visualiza el flujo relacional hacia las preselecciones conceptuales de diseño."
+      },
+      "6": {
+        title: "⑥ Idea Ganadora Seleccionada",
+        desc: "Nuestra propuesta unificada e interactiva de diseño estratégico de cara a resolver la culpa moral del cuidador.",
+        live: "Abre el menú de propuesta de diseño a continuación para revisar el pitch completo."
+      }
+    };
+
+    function switchView(viewId) {
+      currentView = viewId;
+      
+      // Toggle left sidebar panels (Pedagogical vs Territory)
+      const normalFilter = document.getElementById("filter-section-container");
+      const pedagogySeeds = document.getElementById("methodology-seeds-container");
+      const pedagogyFrontiers = document.getElementById("methodology-frontiers-container");
+      const pedagogyFunnel = document.getElementById("methodology-funnel-container");
+
+      // Hide all initially
+      normalFilter.classList.add("hidden");
+      pedagogySeeds.classList.add("hidden");
+      pedagogyFrontiers.classList.add("hidden");
+      pedagogyFunnel.classList.add("hidden");
+
+      if (viewId === "3") {
+        pedagogySeeds.classList.remove("hidden");
+      } else if (viewId === "4") {
+        pedagogyFrontiers.classList.remove("hidden");
+      } else if (viewId === "5") {
+        pedagogyFunnel.classList.remove("hidden");
+      } else {
+        normalFilter.classList.remove("hidden");
+      }
+
+      // Reset active concept highlights unless explicitly dealing with View 5 filtration
+      if (viewId !== "5") {
+        activeConceptHighlight = null;
+        document.getElementById("active-concept-filter-badge").classList.add("hidden");
+      }
+
+      // Update narrative details
+      const info = VIEW_NARRATIVES[viewId];
+      document.getElementById("narrative-title").innerHTML = `<i data-lucide="compass" class="w-4 h-4 text-blue-400"></i> ${info.title}`;
+      document.getElementById("narrative-desc").textContent = info.desc;
+      document.getElementById("live-narrative").textContent = info.live;
+
+      // Update Navigation Buttons state
+      document.querySelectorAll(".nav-btn").forEach(btn => {
+        const isActive = btn.dataset.view === viewId;
+        btn.className = `nav-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all duration-300 flex items-center gap-2 whitespace-nowrap ${
+          isActive 
+            ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20" 
+            : "text-slate-400 hover:text-white hover:bg-white/5"
+        }`;
+      });
+
+      // Clear special link elements in canvas
+      mainG.select(".links-layer").selectAll("*").remove();
+
+      // UI Panel visibility overrides
+      document.getElementById("ranked-overlay-container").classList.add("hidden");
+
+      if (viewId === "1") {
+        // Restore all nodes visibility
+        nodeSelection.transition().duration(500)
+          .attr("opacity", d => !activeClusterFilter || d.cluster === activeClusterFilter ? 1 : 0.08);
+      } 
+      else if (viewId === "2") {
+        // Highlight only mitiga
+        nodeSelection.transition().duration(500)
+          .attr("opacity", d => MITIGATES.includes(d.id) ? 1 : 0.05);
+      } 
+      else if (viewId === "3") {
+        // Highlight seeds
+        nodeSelection.transition().duration(500)
+          .attr("opacity", d => SEED_IDS.includes(d.id) ? 1 : 0.05);
+      } 
+      else if (viewId === "4") {
+        // Highlight Frontiers
+        nodeSelection.transition().duration(500)
+          .attr("opacity", d => FRONTIER_IDS.includes(d.id) ? 1 : 0.03);
+      } 
+      else if (viewId === "5") {
+        if (activeConceptHighlight && CONCEPT_MAPS[activeConceptHighlight]) {
+          const config = CONCEPT_MAPS[activeConceptHighlight];
+          nodeSelection.transition().duration(500)
+            .attr("opacity", d => config.ids.includes(d.id) ? 1 : 0.03);
+
+          // Update active concept pill
+          const pill = document.getElementById("active-concept-filter-badge");
+          document.getElementById("active-concept-filter-name").textContent = config.name;
+          pill.classList.remove("hidden");
+        } else {
+          // General View 5 Convergence
+          const activeIds = [...SEED_IDS, ...FRONTIER_IDS];
+          nodeSelection.transition().duration(500)
+            .attr("opacity", d => activeIds.includes(d.id) ? 1 : 0.03);
+          
+          document.getElementById("active-concept-filter-badge").classList.add("hidden");
+        }
+
+        renderConvergenceFlows();
+      } 
+      else if (viewId === "6") {
+        // Ganadora absoluta
+        nodeSelection.transition().duration(500)
+          .attr("opacity", d => d.id === WINNER_ID ? 1 : 0.02);
+
+        // Instantly focus and open full overlay screen
+        setTimeout(() => {
+          document.getElementById("ranked-overlay-container").classList.remove("hidden");
+        }, 300);
+      }
+
+      applyActiveFilters();
+      lucide.createIcons();
+    }
+
+    function applyActiveFilters() {
+      // Filter overrides only apply on general universe views
+      if (currentView !== "1") return;
+
+      nodeSelection.transition().duration(300)
+        .attr("opacity", d => !activeClusterFilter || d.cluster === activeClusterFilter ? 1 : 0.06);
+
+      // Update counters
+      const visibleCount = activeClusterFilter 
+        ? DATA.filter(d => d.cluster === activeClusterFilter).length 
+        : DATA.length;
+      document.getElementById("cnt-visible").textContent = visibleCount;
+    }
+
+    // ============================================================
+    // VIEW 5: INTERACTIVE FLOW CONNECTIONS GENERATION
+    // ============================================================
+    function renderConvergenceFlows() {
+      const linkG = mainG.select(".links-layer");
+      const container = document.getElementById("canvas-container");
+      const w = container.clientWidth;
+      const h = container.clientHeight;
+
+      // Define three abstract preselection hubs in center area
+      const hubs = [
+        { id: "hub1", name: "🛡️ Traspaso de Guardia", x: w * 0.35, y: h * 0.45, color: "#f87171" },
+        { id: "hub2", name: "📈 Bienestar Conductual", x: w * 0.5, y: h * 0.55, color: "#60a5fa" },
+        { id: "hub3", name: "🗣️ Asistencia Conversacional", x: w * 0.65, y: h * 0.45, color: "#fbbf24" }
+      ];
+
+      // Draw hubs with click events
+      hubs.forEach(hub => {
+        const isHighlightedHub = activeConceptHighlight && CONCEPT_MAPS[activeConceptHighlight] && CONCEPT_MAPS[activeConceptHighlight].hubId === hub.id;
+        const isAnyHighlight = !!activeConceptHighlight;
+        const opacityVal = isAnyHighlight ? (isHighlightedHub ? 1 : 0.15) : 0.85;
+
+        const hGroup = linkG.append("g")
+          .attr("class", "flow-hub")
+          .attr("opacity", opacityVal)
+          .style("cursor", "pointer")
+          .on("click", (event, d) => {
+            selectHub(hub.id);
+            event.stopPropagation();
+          });
+        
+        hGroup.append("circle")
+          .attr("cx", hub.x)
+          .attr("cy", hub.y)
+          .attr("r", isHighlightedHub ? 36 : 28)
+          .attr("fill", "rgba(15, 23, 42, 0.95)")
+          .attr("stroke", hub.color)
+          .attr("stroke-width", isHighlightedHub ? 3 : 2)
+          .attr("class", isHighlightedHub ? "pulse-glow" : "");
+
+        hGroup.append("text")
+          .attr("x", hub.x)
+          .attr("y", hub.y)
+          .attr("text-anchor", "middle")
+          .attr("dominant-baseline", "central")
+          .attr("fill", "#fff")
+          .attr("font-size", isHighlightedHub ? "9px" : "8px")
+          .attr("font-weight", "bold")
+          .text(hub.name);
+
+        // Zoom onto specific hub smoothly if chosen
+        if (isHighlightedHub) {
+          focusOnHub(hub.x, hub.y, 1.25);
+        }
+      });
+
+      // Draw custom curved particles line from nodes to hubs
+      nodeSelection.each(function(d) {
+        const isSeed = SEED_IDS.includes(d.id);
+        const isFrontier = FRONTIER_IDS.includes(d.id);
+        
+        let belongsToActiveConcept = false;
+        if (activeConceptHighlight && CONCEPT_MAPS[activeConceptHighlight]) {
+          belongsToActiveConcept = CONCEPT_MAPS[activeConceptHighlight].ids.includes(d.id);
+        }
+
+        // Filter lines to draw based on filtration state
+        if (activeConceptHighlight) {
+          if (!belongsToActiveConcept) return;
+        } else {
+          if (!isSeed && !isFrontier) return;
+        }
+
+        // Map node to its appropriate target hub
+        let targetHub = hubs[0]; // default hub1 (Coordinación)
+        if (d.cluster.includes("Salud Mental") || d.cluster.includes("Validación") || d.cluster.includes("Descanso") || d.cluster.includes("Incertidumbre")) {
+          targetHub = hubs[1]; // hub2
+        } else if (d.cluster.includes("Autonomía") || d.cluster.includes("Educación") || d.cluster.includes("Delegación")) {
+          targetHub = hubs[2]; // hub3
+        }
+
+        // Override target if in conceptual filtering mode
+        if (activeConceptHighlight && CONCEPT_MAPS[activeConceptHighlight]) {
+          const currentMap = CONCEPT_MAPS[activeConceptHighlight];
+          const matchedHub = hubs.find(h => h.id === currentMap.hubId);
+          if (matchedHub) targetHub = matchedHub;
+        }
+
+        const sourceX = d.x;
+        const sourceY = d.y;
+        const targetX = targetHub.x;
+        const targetY = targetHub.y;
+
+        // Create curved quadratic lines
+        const midX = (sourceX + targetX) / 2 + (Math.random() - 0.5) * 60;
+        const midY = (sourceY + targetY) / 2 + (Math.random() - 0.5) * 60;
+        const pathData = `M ${sourceX} ${sourceY} Q ${midX} ${midY} ${targetX} ${targetY}`;
+
+        linkG.append("path")
+          .attr("d", pathData)
+          .attr("fill", "none")
+          .attr("stroke", targetHub.color)
+          .attr("stroke-width", activeConceptHighlight ? 2.5 : 1.2)
+          .attr("opacity", activeConceptHighlight ? 0.8 : 0.45)
+          .attr("class", "flow-line");
+      });
+    }
+
+    // Handles Hub focus and Pedagogical sidebar injection
+    function selectHub(hubId) {
+      let conceptKey = null;
+      if (hubId === "hub1") conceptKey = "Concepto #4";
+      if (hubId === "hub2") conceptKey = "Concepto #2";
+      if (hubId === "hub3") conceptKey = "Concepto #3";
+
+      activeConceptHighlight = conceptKey;
+
+      // Redraw View 5 to show filtered energy paths & zoom
+      switchView("5");
+
+      // Now, show the Hub Pedagogy in the right panel and expand it!
+      showRightPanel();
+      document.getElementById("inspect-empty").classList.add("hidden");
+      document.getElementById("inspect-content").classList.remove("hidden");
+
+      // Re-purpose the Inspect Content for Hub Pedagogy!
+      const info = HUBS_PEDAGOGY[hubId];
+      document.getElementById("inspect-id").textContent = hubId.toUpperCase();
+      
+      // badges
+      const badgesContainer = document.getElementById("inspect-badges");
+      badgesContainer.innerHTML = `<span class="text-[9px] px-2 py-0.5 rounded-full font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20">Pilar de Traducción</span>`;
+      
+      document.getElementById("inspect-idea-text").innerHTML = `<span class="text-blue-400 font-extrabold block text-xs uppercase tracking-wider mb-1">Pilar Central</span> ${info.name}`;
+      
+      const clBadge = document.getElementById("inspect-cluster-badge");
+      clBadge.textContent = "CONVERGENCIA";
+      clBadge.style.color = "#a78bfa";
+      clBadge.style.borderColor = "rgba(167, 139, 250, 0.4)";
+      clBadge.style.backgroundColor = "rgba(167, 139, 250, 0.15)";
+
+      // Hide frontier deep block
+      document.getElementById("inspect-frontier-block").classList.add("hidden");
+
+      // Set comment
+      document.getElementById("inspect-comment").innerHTML = `
+        <div class="flex flex-col gap-2 mt-1">
+          <p><strong>¿Qué significa?</strong><br>${info.meaning}</p>
+          <p class="mt-1"><strong>Tensión Dialéctica:</strong><br>${info.tension}</p>
+          <p class="mt-1"><strong>Evolución de Diseño:</strong><br>${info.result}</p>
+        </div>
+      `;
+
+      showToast(`Focalizando en el pilar: ${info.name}`);
+    }
+
+    // Clear Concept Floating badge Action
+    document.getElementById("clear-concept-filter-btn").addEventListener("click", () => {
+      activeConceptHighlight = null;
+      document.getElementById("active-concept-filter-badge").classList.add("hidden");
+      resetZoomScale();
+      switchView("5");
+    });
+
+    // ============================================================
+    // SELECTION & INTERACTION INSPECTOR MANAGEMENT
+    // ============================================================
+    function selectNodeElement(d) {
+      selectedNode = d;
+
+      // Reset sizes of all nodes first to maintain balance
+      nodeSelection.selectAll("circle.main-circle-select").remove();
+      
+      // Add glowing selection ring
+      d3.select(nodeSelection.nodes().find(node => d3.select(node).datum().id === d.id))
+        .append("circle")
+        .attr("class", "main-circle-select")
+        .attr("r", d.r + 5)
+        .attr("fill", "none")
+        .attr("stroke", "#3b82f6")
+        .attr("stroke-width", 2)
+        .attr("opacity", 0.85);
+
+      // Smoothly slide open right details panel
+      showRightPanel();
+
+      // Show Inspect panel content
+      document.getElementById("inspect-empty").classList.add("hidden");
+      document.getElementById("inspect-content").classList.remove("hidden");
+
+      // Handle Frontier Deep Information dynamically
+      const frontierBlock = document.getElementById("inspect-frontier-block");
+      const isFrontier = FRONTIER_IDS.includes(d.id);
+
+      if (isFrontier) {
+        const info = FRONTIER_INFO[d.id];
+        frontierBlock.classList.remove("hidden");
+        document.getElementById("inspect-frontier-why").textContent = info.whyCrazy;
+        document.getElementById("inspect-frontier-reveal").textContent = info.reveal;
+        
+        // Render associated concepts tags
+        const tagsContainer = document.getElementById("inspect-frontier-keywords");
+        tagsContainer.innerHTML = "";
+        info.keywords.forEach(kw => {
+          tagsContainer.innerHTML += `<span class="text-[9px] px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20 font-medium">✨ ${kw}</span>`;
+        });
+
+        // Override default idea text and comment with enriched screenshot facts
+        document.getElementById("inspect-idea-text").innerHTML = `<span class="text-amber-400 font-extrabold block text-xs uppercase tracking-wider mb-1">💡 Concepto Frontera: "${info.name}"</span> ${info.description}`;
+        document.getElementById("inspect-comment").textContent = `Esta idea radical nos desafía metodológicamente. Revelación de diseño: ${info.reveal}`;
+      } else {
+        frontierBlock.classList.add("hidden");
+        document.getElementById("inspect-idea-text").textContent = d.idea;
+        document.getElementById("inspect-comment").textContent = d.comentario ? d.comentario : "No se registraron notas de diseño adicionales para esta propuesta en el mapeo inicial.";
+      }
+
+      document.getElementById("inspect-id").textContent = d.id;
+      
+      const clBadge = document.getElementById("inspect-cluster-badge");
+      clBadge.textContent = d.cluster;
+      clBadge.style.color = CLUSTER_COLORS[d.cluster];
+      clBadge.style.borderColor = `${CLUSTER_COLORS[d.cluster]}40`;
+      clBadge.style.backgroundColor = `${CLUSTER_COLORS[d.cluster]}15`;
+
+      // Update dynamic badges inside inspectors
+      const badgesContainer = document.getElementById("inspect-badges");
+      badgesContainer.innerHTML = "";
+
+      const isSeed = SEED_IDS.includes(d.id);
+      const isMitiga = MITIGATES.includes(d.id);
+
+      if (isMitiga) {
+        badgesContainer.innerHTML += `<span class="text-[9px] px-2 py-0.5 rounded-full font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">✓ Mitiga culpa</span>`;
+      }
+      if (isSeed) {
+        badgesContainer.innerHTML += `<span class="text-[9px] px-2 py-0.5 rounded-full font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">💡 Semilla</span>`;
+      }
+      if (isFrontier) {
+        badgesContainer.innerHTML += `<span class="text-[9px] px-2 py-0.5 rounded-full font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">🔥 Frontera</span>`;
+      }
+
+      document.getElementById("live-narrative").textContent = `Inspeccionando ${d.id}: "${d.idea.substring(0,60)}..."`;
+      lucide.createIcons();
+    }
+
+    // Interactive rendering of selected slide details on Sidebar inspector
+    function selectConceptDetailInSidebar(conceptCode) {
+      const details = RANKED_IDEAS_DETAILS[conceptCode];
+      if (!details) return;
+
+      showRightPanel();
+      document.getElementById("inspect-empty").classList.add("hidden");
+      document.getElementById("inspect-content").classList.remove("hidden");
+
+      document.getElementById("inspect-id").textContent = conceptCode;
+      
+      const badgesContainer = document.getElementById("inspect-badges");
+      badgesContainer.innerHTML = `<span class="text-[9px] px-2 py-0.5 rounded-full font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Propuesta Seleccionada</span>`;
+
+      document.getElementById("inspect-idea-text").innerHTML = `<span class="text-emerald-400 font-extrabold block text-xs uppercase tracking-wider mb-1">Propuesta de Diseño</span> ${details.title}`;
+      
+      const clBadge = document.getElementById("inspect-cluster-badge");
+      clBadge.textContent = "ESTRATEGIA FINAL";
+      clBadge.style.color = "#10b981";
+      clBadge.style.borderColor = "rgba(16, 185, 129, 0.4)";
+      clBadge.style.backgroundColor = "rgba(16, 185, 129, 0.15)";
+
+      // Hide frontier deep block
+      document.getElementById("inspect-frontier-block").classList.add("hidden");
+
+      // Set accordion/slide narrative
+      document.getElementById("inspect-comment").innerHTML = `
+        <div class="flex flex-col gap-3 mt-1 text-slate-300 leading-relaxed text-xs">
+          ${details.details}
+        </div>
+      `;
+
+      showToast(`Mostrando ficha metodológica de la propuesta seleccionada.`);
+    }
+
+    function clearSelection() {
+      selectedNode = null;
+      nodeSelection.selectAll("circle.main-circle-select").remove();
+      document.getElementById("inspect-empty").classList.remove("hidden");
+      document.getElementById("inspect-content").classList.add("hidden");
+      
+      // Smoothly slide minimize the right panel
+      hideRightPanel();
+    }
+
+    function setHoverPreview(d) {
+      if (selectedNode) return;
+      document.getElementById("live-narrative").textContent = `Foco en ${d.id}: "${d.idea}"`;
+    }
+
+    function clearHoverPreview() {
+      if (selectedNode) return;
+      document.getElementById("live-narrative").textContent = VIEW_NARRATIVES[currentView].live;
+    }
+
+    // ============================================================
+    // THE CINEMATIC COOPERATIVE TOUR MACHINE
+    // ============================================================
+    function startAutoTour() {
+      tourActive = true;
+      tourStep = 0;
+      
+      const controller = document.getElementById("tour-controller");
+      // Desactivamos la visualización de la ventana emergente flotante del tour
+      controller.classList.add("hidden");
+
+      // Show side metrics panel
+      document.getElementById("tour-metrics-panel").classList.remove("flex", "hidden");
+      document.getElementById("tour-metrics-panel").classList.add("flex");
+      
+      // Minimize standard empty text in right panel so layout looks beautiful
+      document.getElementById("inspect-empty").classList.add("hidden");
+      showRightPanel();
+
+      runTourStep();
+    }
+
+    function runTourStep() {
+      if (!tourActive) return;
+      const stepData = TOUR_STEPS[tourStep];
+
+      // Update text in HUD
+      document.getElementById("tour-step-indicator").textContent = `Paso ${tourStep + 1} / 6`;
+      document.getElementById("tour-step-title").textContent = stepData.title;
+      document.getElementById("tour-step-desc").textContent = stepData.desc;
+
+      // Smooth switch view visually
+      switchView(stepData.view);
+
+      // Animate indicators/rating metrics inside sidebar
+      animateTourRatingBars(stepData.metrics);
+
+      // Camera focal transition
+      if (stepData.focusNode) {
+        // Find in coordinates
+        if (stepData.focusNode.startsWith("hub")) {
+          // It's a view 5 Hub. Focus center-left/center-right accordingly
+          const container = document.getElementById("canvas-container");
+          const w = container.clientWidth;
+          const h = container.clientHeight;
+          let focusX = w * 0.35, focusY = h * 0.45;
+          if (stepData.focusNode === "hub2") { focusX = w * 0.5; focusY = h * 0.55; }
+          else if (stepData.focusNode === "hub3") { focusX = w * 0.65; focusY = h * 0.45; }
+          focusOnHub(focusX, focusY, 1.4);
+        } else {
+          // It's a specific Node id
+          const target = DATA.find(n => n.id === stepData.focusNode);
+          if (target && nodeSelection) {
+            const d3Node = nodeSelection.filter(d => d.id === stepData.focusNode).datum();
+            if (d3Node) {
+              focusOnHub(d3Node.x, d3Node.y, 1.8);
+              selectNodeElement(d3Node);
+            }
+          }
+        }
+      } else {
+        // Centralize cosmos
+        resetZoomScale();
+        clearSelection();
+        // If we centralized, we must ensure right panel remains open showing metrics
+        showRightPanel();
+        document.getElementById("inspect-empty").classList.add("hidden");
+      }
+
+      // Animate progress line on HUD
+      const progressLine = document.getElementById("tour-step-progress");
+      progressLine.style.transition = 'none';
+      progressLine.style.width = '0%';
+      
+      // Force repaint
+      progressLine.offsetHeight;
+
+      progressLine.style.transition = `width ${TOUR_STEP_DURATION}ms linear`;
+      progressLine.style.width = '100%';
+
+      // Setup automatic slide progression timer
+      clearInterval(tourInterval);
+      tourInterval = setInterval(() => {
+        if (tourStep < TOUR_STEPS.length - 1) {
+          tourStep++;
+          runTourStep();
+        } else {
+          exitTour();
+          showToast("🏆 Recorrido metodológico finalizado con éxito.");
+        }
+      }, TOUR_STEP_DURATION);
+    }
+
+    function animateTourRatingBars(metrics) {
+      const bars = [
+        { id: "metric-novedad", val: metrics.novelty },
+        { id: "metric-fact", val: metrics.fact },
+        { id: "metric-viab", val: metrics.viab },
+        { id: "metric-deseo", val: metrics.deseo },
+        { id: "metric-impacto", val: metrics.impact }
+      ];
+
+      bars.forEach(b => {
+        document.getElementById(`${b.id}-val`).textContent = `${b.val} / 5`;
+        document.getElementById(`${b.id}-bar`).style.width = `${(b.val / 5) * 100}%`;
+      });
+    }
+
+    function exitTour() {
+      tourActive = false;
+      clearInterval(tourInterval);
+      document.getElementById("tour-controller").classList.add("hidden");
+      document.getElementById("tour-metrics-panel").classList.add("hidden");
+      document.getElementById("tour-metrics-panel").classList.remove("flex");
+      
+      resetZoomScale();
+      clearSelection();
+      switchView("1");
+    }
+
+    // ============================================================
+    // UNIVERSAL DRAG & DROP FOR HUD PANEL
+    // ============================================================
+    function makeElementDraggable(elmnt, dragHandle) {
+      let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+      
+      if (dragHandle) {
+        dragHandle.addEventListener("mousedown", dragMouseDown, { passive: false });
+        dragHandle.addEventListener("touchstart", dragMouseDown, { passive: false });
+      } else {
+        elmnt.addEventListener("mousedown", dragMouseDown, { passive: false });
+        elmnt.addEventListener("touchstart", dragMouseDown, { passive: false });
+      }
+
+      function dragMouseDown(e) {
+        e = e || window.event;
+        if (e.target.closest('button') || e.target.closest('input')) return;
+        
+        // Prevent default scrolling on mobile drag
+        if (e.cancelable) e.preventDefault();
+
+        // Calculate absolute position values to freeze current positioning
+        const rect = elmnt.getBoundingClientRect();
+        elmnt.style.left = rect.left + "px";
+        elmnt.style.top = rect.top + "px";
+        elmnt.style.right = "auto"; 
+        elmnt.style.width = rect.width + "px"; // freeze width dimensions on drag
+
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+        pos3 = clientX;
+        pos4 = clientY;
+
+        document.addEventListener("mouseup", closeDragElement);
+        document.addEventListener("touchend", closeDragElement);
+        document.addEventListener("mousemove", elementDrag, { passive: false });
+        document.addEventListener("touchmove", elementDrag, { passive: false });
+      }
+
+      function elementDrag(e) {
+        e = e || window.event;
+        if (e.cancelable) e.preventDefault();
+
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+        pos1 = pos3 - clientX;
+        pos2 = pos4 - clientY;
+        pos3 = clientX;
+        pos4 = clientY;
+
+        let topPos = elmnt.offsetTop - pos2;
+        let leftPos = elmnt.offsetLeft - pos1;
+
+        const rect = elmnt.getBoundingClientRect();
+        const wWidth = window.innerWidth;
+        const hHeight = window.innerHeight;
+
+        // Keep inside window bounds
+        if (topPos < 10) topPos = 10;
+        if (topPos > hHeight - rect.height - 10) topPos = hHeight - rect.height - 10;
+        if (leftPos < 10) leftPos = 10;
+        if (leftPos > wWidth - rect.width - 10) leftPos = wWidth - rect.width - 10;
+
+        elmnt.style.top = topPos + "px";
+        elmnt.style.left = leftPos + "px";
+      }
+
+      function closeDragElement() {
+        document.removeEventListener("mouseup", closeDragElement);
+        document.removeEventListener("touchend", closeDragElement);
+        document.removeEventListener("mousemove", elementDrag);
+        document.removeEventListener("touchmove", elementDrag);
+      }
+    }
+
+    // HUD controllers mapping
+    document.getElementById("start-tour-btn").addEventListener("click", () => {
+      startAutoTour();
+      showToast("🚀 Iniciando recorrido auto-guiado por las fases.");
+    });
+    document.getElementById("tour-btn-exit").addEventListener("click", exitTour);
+    
+    document.getElementById("tour-btn-play").addEventListener("click", () => {
+      const playIcon = document.getElementById("tour-play-icon");
+      if (tourActive) {
+        // Pause tour sliding
+        tourActive = false;
+        clearInterval(tourInterval);
+        playIcon.setAttribute("data-lucide", "play");
+        showToast("Recorrido pausado.");
+      } else {
+        // Resume sliding
+        tourActive = true;
+        playIcon.setAttribute("data-lucide", "pause");
+        runTourStep();
+        showToast("Recorrido reanudado.");
+      }
+      lucide.createIcons();
+    });
+
+    document.getElementById("tour-btn-next").addEventListener("click", () => {
+      if (tourStep < TOUR_STEPS.length - 1) {
+        tourStep++;
+        runTourStep();
+      } else {
+        exitTour();
+      }
+    });
+
+    document.getElementById("tour-btn-prev").addEventListener("click", () => {
+      if (tourStep > 0) {
+        tourStep--;
+        runTourStep();
+      }
+    });
+
+    // ============================================================
+    // NAV EVENTS & TRIGGERS
+    // ============================================================
+    document.querySelectorAll(".nav-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const v = btn.dataset.view;
+        switchView(v);
+      });
+    });
+
+    document.getElementById("reset-sim-btn").addEventListener("click", () => {
+      activeClusterFilter = null;
+      activeConceptHighlight = null;
+      renderTerritoryFilters();
+      initD3Simulation();
+      switchView("1");
+      clearSelection();
+      showToast("Espacio cósmico y simulación reiniciados.");
+    });
+
+    // Special View 6 overlay handlers
+    document.getElementById("close-ranked-overlay").addEventListener("click", () => {
+      switchView("5"); // Go back to view 5
+    });
+
+    // Explore concepts link buttons on card panel (RESOLVED AND UPGRADED BUG)
+    document.querySelectorAll(".explore-concept-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const concept = btn.dataset.concept;
+        
+        // Hide overlay container smoothly
+        document.getElementById("ranked-overlay-container").classList.add("hidden");
+        
+        // Setup Concept Highlight state
+        activeConceptHighlight = concept;
+        
+        // Switch to D3 Convergence (View 5) to draw and filter source links
+        switchView("5"); 
+
+        // Also open detail sheet on the sidebar!
+        selectConceptDetailInSidebar(concept);
+        
+        showToast(`Destacando ideas fuente para: ${CONCEPT_MAPS[concept] ? CONCEPT_MAPS[concept].name : 'Concepto Ganador'}`);
+      });
+    });
+
+    // Interactive Seed Explainer focus button clicks
+    document.querySelectorAll(".seed-focus-trigger").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const nodeId = btn.dataset.nodeId;
+        const node = DATA.find(n => n.id === nodeId);
+        if (node && nodeSelection) {
+          // Highlight and zoom in D3
+          const d3Node = nodeSelection.filter(d => d.id === nodeId).datum();
+          if (d3Node) {
+            focusOnHub(d3Node.x, d3Node.y, 1.8);
+            selectNodeElement(d3Node);
+            showToast(`Foco en Semilla: [${nodeId}]`);
+          }
+        }
+      });
+    });
+
+    // Interactive Frontier Explainer focus button clicks
+    document.querySelectorAll(".frontier-focus-trigger").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const nodeId = btn.dataset.nodeId;
+        const node = DATA.find(n => n.id === nodeId);
+        if (node && nodeSelection) {
+          // Highlight and zoom in D3
+          const d3Node = nodeSelection.filter(d => d.id === nodeId).datum();
+          if (d3Node) {
+            focusOnHub(d3Node.x, d3Node.y, 1.8);
+            selectNodeElement(d3Node);
+            showToast(`Foco en Concepto Frontera: [${nodeId}]`);
+          }
+        }
+      });
+    });
+
+    // ============================================================
+    // INIT PROTOCOL
+    // ============================================================
+    window.onload = function () {
+      initStarfield();
+      renderTerritoryFilters();
+      initD3Simulation();
+      switchView("1");
+      
+      // Initialize Draggable HUD system
+      makeElementDraggable(
+        document.getElementById("tour-controller"), 
+        document.getElementById("tour-controller-header")
+      );
+      
+      lucide.createIcons();
+    };
+
+    window.addEventListener("resize", () => {
+      initD3Simulation();
+      switchView(currentView);
+    });
+  </script>
+</body>
+</html>
